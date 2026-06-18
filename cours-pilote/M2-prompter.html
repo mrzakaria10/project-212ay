@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M2 — Prompter efficacement | 212ay.com</title>
+  <style>
+    :root { --bg:#081120; --bg-soft:#0d1830; --card:rgba(255,255,255,0.08); --border:rgba(255,255,255,0.12); --text:#eef4ff; --muted:#b8c4dc; --primary:#6d7cff; --secondary:#00c2a8; --accent:#9f7aea; --warning:#ffb454; --success:#30d158; --danger:#ff6b6b; --radius:20px; --container:1000px; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:radial-gradient(circle at top left,rgba(109,124,255,0.18),transparent 25%),radial-gradient(circle at top right,rgba(0,194,168,0.14),transparent 20%),linear-gradient(180deg,#07111f 0%,#0a1326 100%); color:var(--text); line-height:1.6; }
+    .container { width:min(100% - 32px,var(--container)); margin:0 auto; }
+    .topbar { position:sticky; top:0; z-index:50; backdrop-filter:blur(16px); background:rgba(7,17,31,0.85); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .topbar-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .brand-badge { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; background:linear-gradient(135deg,var(--primary),var(--accent)); font-weight:900; font-size:14px; }
+    .nav { display:flex; gap:6px; flex-wrap:wrap; }
+    .nav a { padding:8px 14px; border-radius:999px; color:var(--muted); transition:0.25s; font-size:13px; text-decoration:none; }
+    .nav a:hover, .nav a.active { color:white; background:rgba(255,255,255,0.08); }
+    .hero { padding:40px 0 24px; }
+    .hero-card { padding:28px; border-radius:var(--radius); background:var(--card); border:1px solid var(--border); box-shadow:0 20px 60px rgba(0,0,0,0.35); }
+    .module-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:rgba(109,124,255,0.15); color:#b3c4ff; border:1px solid rgba(255,255,255,0.08); font-size:12px; font-weight:700; margin-bottom:12px; }
+    h1 { margin:0 0 8px; font-size:clamp(1.6rem,3vw,2.6rem); letter-spacing:-0.02em; }
+    .lead { margin:0 0 16px; color:var(--muted); font-size:1rem; }
+    .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:13px; color:#e8efff; }
+    .progress-bar { height:6px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; margin-top:8px; }
+    .progress-bar > span { display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--secondary),var(--primary)); border-radius:inherit; transition:width 0.5s ease; }
+    .lesson-tabs { display:flex; gap:8px; margin:20px 0; padding:6px; border-radius:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); overflow-x:auto; }
+    .lesson-tab { padding:12px 20px; border-radius:12px; border:none; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; font-size:14px; transition:0.2s; white-space:nowrap; }
+    .lesson-tab:hover { background:rgba(255,255,255,0.06); }
+    .lesson-tab.active { background:linear-gradient(135deg,rgba(109,124,255,0.2),rgba(159,122,234,0.2)); color:white; border:1px solid rgba(255,255,255,0.1); }
+    .lesson-panel { display:none; }
+    .lesson-panel.active { display:block; }
+    .format-bar { display:flex; gap:8px; margin-bottom:16px; padding:6px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); width:fit-content; }
+    .format-btn { padding:8px 16px; border-radius:10px; border:none; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; font-size:13px; transition:0.2s; }
+    .format-btn.active { background:linear-gradient(135deg,rgba(109,124,255,0.22),rgba(159,122,234,0.22)); color:white; border:1px solid rgba(255,255,255,0.1); }
+    .lesson-body { display:none; }
+    .lesson-body.active { display:block; }
+    .lesson-body h4 { margin:20px 0 8px; color:#b3c4ff; }
+    .lesson-body pre, .code-block { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; overflow-x:auto; font-family:'JetBrains Mono','Fira Code',monospace; font-size:13px; line-height:1.5; color:#c9d4ff; }
+    .lesson-body code { font-family:'JetBrains Mono',monospace; color:#b3c4ff; font-size:13px; }
+    .tag { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; margin-right:6px; }
+    .tag-h { background:rgba(255,180,84,0.2); color:#ffb454; }
+    .tag-c { background:rgba(109,124,255,0.2); color:#6d7cff; }
+    .tag-d { background:rgba(0,194,168,0.2); color:#00c2a8; }
+    .tag-a { background:rgba(159,122,234,0.2); color:#9f7aea; }
+    .action-box { margin:20px 0; padding:20px; border-radius:16px; background:rgba(159,122,234,0.08); border:1px solid rgba(159,122,234,0.15); }
+    .quiz-section { padding:32px 0 48px; }
+    .quiz-card { padding:24px; border-radius:var(--radius); background:var(--card); border:1px solid var(--border); }
+    .quiz-question { margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .quiz-question:last-child { border-bottom:none; }
+    .quiz-q-text { font-weight:700; margin-bottom:10px; font-size:15px; }
+    .quiz-option { display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); cursor:pointer; transition:0.2s; }
+    .quiz-option:hover { background:rgba(255,255,255,0.07); }
+    .quiz-option.selected { border-color:var(--primary); background:rgba(109,124,255,0.12); }
+    .quiz-option.correct { border-color:var(--success); background:rgba(48,209,88,0.12); }
+    .quiz-option.wrong { border-color:var(--danger); background:rgba(255,107,107,0.12); }
+    .quiz-option input[type="radio"] { accent-color:var(--primary); }
+    .quiz-option label { cursor:pointer; flex:1; }
+    .btn { border:none; border-radius:12px; padding:12px 20px; cursor:pointer; font-weight:700; transition:0.2s; text-decoration:none; display:inline-block; }
+    .btn-primary { background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff; box-shadow:0 8px 24px rgba(109,124,255,0.3); }
+    .btn-primary:hover { transform:translateY(-1px); }
+    .btn-secondary { background:rgba(255,255,255,0.08); color:white; border:1px solid rgba(255,255,255,0.12); }
+    .btn-secondary:hover { background:rgba(255,255,255,0.12); }
+    .quiz-result { display:none; margin-top:16px; }
+    .quiz-result.show { display:block; }
+    .quiz-score { font-size:24px; font-weight:800; text-align:center; padding:16px; border-radius:14px; }
+    .quiz-score.pass { background:rgba(48,209,88,0.12); color:var(--success); }
+    .quiz-score.fail { background:rgba(255,107,107,0.12); color:var(--danger); }
+    .quiz-justify { margin-top:10px; padding:12px; border-radius:10px; background:rgba(255,255,255,0.03); border-left:3px solid var(--primary); font-size:14px; color:var(--muted); }
+    .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:rgba(48,209,88,0.1); color:#d6ffe2; border:1px solid rgba(48,209,88,0.18); font-size:13px; font-weight:700; cursor:pointer; }
+    .module-outro { margin-top:32px; padding:24px; border-radius:var(--radius); background:linear-gradient(135deg,rgba(109,124,255,0.12),rgba(0,194,168,0.08)); border:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+    .module-outro h3 { margin:0; }
+    .match-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0; }
+    @media (max-width:640px) { .hero-card { padding:20px; } .match-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <div class="brand-badge">212</div>
+      <div>
+        <div style="font-size:14px;">212ay.com</div>
+        <small style="color:var(--muted);font-size:11px;">Parcours : Vibe Coding</small>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#hero" class="active">Leçons</a>
+      <a href="#quiz">Quiz</a>
+      <a href="../Structure_des_coures_212ay.html">← Retour cours</a>
+    </nav>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-card">
+      <div class="module-badge">📦 Module 2</div>
+      <h1>Prompter efficacement pour générer du code</h1>
+      <p class="lead">Maîtrise l'art du prompt technique : structure, boilerplate, et comparaison faible vs fort pour obtenir un code exploitable du premier coup.</p>
+      <div class="meta-row">
+        <span class="pill">⏱️ 45 min</span>
+        <span class="pill">📖 3 leçons</span>
+        <span class="pill">✅ Quiz final</span>
+        <span class="pill">🎬 🎧 📖 Formats disponibles</span>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);">
+          <span id="progText">0/3 leçons</span>
+          <span id="progPct">0%</span>
+        </div>
+        <div class="progress-bar"><span id="progBar"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABS -->
+  <div class="lesson-tabs" id="lessonTabs">
+    <button class="lesson-tab active" data-lesson="1" onclick="switchLesson(1)">📖 2.1 — Anatomie d'un bon prompt</button>
+    <button class="lesson-tab" data-lesson="2" onclick="switchLesson(2)">📖 2.2 — Générer du boilerplate</button>
+    <button class="lesson-tab" data-lesson="3" onclick="switchLesson(3)">📖 2.3 — Prompts faibles vs forts</button>
+  </div>
+
+  <!-- LESSON 2.1 -->
+  <div class="lesson-panel active" id="lesson1">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(1,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(1,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(1,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l1-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 14 min</div><div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M2-Lecon2.1/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 14 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(1)" id="c1badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l1-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 14 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;"><div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div></div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+    <div class="lesson-body" id="l1-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu tapes "crée un formulaire React" et tu passes 20 min à retoucher le résultat. Ton collègue obtient exactement ce qu'il veut en un seul prompt. La différence ? La structure de sa demande.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — Les 5 piliers</span>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:6px;margin-top:8px;font-size:14px;">
+          <div style="padding:8px;border-radius:8px;background:rgba(109,124,255,0.1);font-weight:700;">1. RÔLE</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);">"Tu es expert React senior"</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(0,194,168,0.1);font-weight:700;">2. CONTEXTE</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);">"Next.js 14 + Tailwind + Prisma"</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,180,84,0.1);font-weight:700;">3. TÂCHE</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);">"Crée un formulaire d'inscription 4 champs"</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(159,122,234,0.1);font-weight:700;">4. FORMAT</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);">"TypeScript, export default, props typées"</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,107,107,0.1);font-weight:700;">5. CONTRAINTE</div><div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);">"Pas de lib externe, gère loading/error/empty"</div>
+        </div>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo — Prompt faible vs fort</span>
+        <p style="margin:8px 0 4px;color:var(--muted);"><strong>Faible :</strong> "Crée un formulaire React" → 30 lignes génériques sans validation ni style</p>
+        <p style="margin:4px 0 0;color:var(--muted);"><strong>Fort :</strong> (5 piliers, 10 lignes précises) → 80 lignes prêtes à l'emploi, typées, stylées, avec validation Zod</p>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;">Choisis un composant de ton projet. Écris un prompt structuré avec les 5 piliers. Compare avec une version sans structure.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LESSON 2.2 -->
+  <div class="lesson-panel" id="lesson2">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(2,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(2,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(2,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l2-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 14 min</div><div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M2-Lecon2.2/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 14 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(2)" id="c2badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l2-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 14 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;"><div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div></div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+    <div class="lesson-body" id="l2-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu passes 15 min à créer la structure d'un nouveau projet. Et si tu pouvais tout obtenir en 30 secondes ?</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept</span>
+        <p style="margin:8px 0 0;color:var(--muted);">L'IA excelle dans les tâches répétitives et prévisibles : structures de projet, composants standards (Card, Modal, Button), routes CRUD, fichiers de config. <strong>Utilise-la pour ça.</strong></p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo — 3 use cases</span>
+        <p style="margin:8px 0 4px;"><strong>1. Structure Next.js :</strong> "Génère la structure complète Next.js 14 avec app router, layout, Header/Footer, Tailwind, dossier lib/ et types/"</p>
+        <p style="margin:4px 0;"><strong>2. Modal réutilisable :</strong> "Composant Modal React + Tailwind avec overlay, fermeture clic, animation fade, createPortal, TypeScript"</p>
+        <p style="margin:4px 0 0;"><strong>3. CRUD Express :</strong> "Routes Express CRUD produits avec TypeScript, validation Zod, recherche, pagination"</p>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;">Choisis un boilerplate (structure projet, composant, ou CRUD). Génère-le avec un prompt structuré. Note le temps gagné.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LESSON 2.3 -->
+  <div class="lesson-panel" id="lesson3">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(3,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(3,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(3,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l3-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 15 min</div><div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M2-Lecon2.3/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 15 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(3)" id="c3badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l3-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 15 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;"><div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div></div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+    <div class="lesson-body" id="l3-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">La différence entre un prompt faible et un prompt fort peut multiplier ta productivité par 10. C'est la compétence la plus importante du module.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — Match faible vs fort</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Prompt faible = vague, pas de contexte → résultat générique. Prompt fort = rôle + contexte + tâche + format + contrainte → résultat exploitable.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo — 5 matchs</span>
+        <div class="match-grid">
+          <div style="padding:10px;border-radius:10px;background:rgba(255,107,107,0.08);"><strong style="color:#ff6b6b;">FAIBLE</strong><br><span style="font-size:13px;">"Crée une API"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(48,209,88,0.08);"><strong style="color:#30d158;">FORT</strong><br><span style="font-size:13px;">"Senior backend, Express + TS + Prisma, CRUD users, JWT"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(255,107,107,0.08);"><strong style="color:#ff6b6b;">FAIBLE</strong><br><span style="font-size:13px;">"Fais un bouton"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(48,209,88,0.08);"><strong style="color:#30d158;">FORT</strong><br><span style="font-size:13px;">"Button React + variants + sizes + loading + disabled"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(255,107,107,0.08);"><strong style="color:#ff6b6b;">FAIBLE</strong><br><span style="font-size:13px;">"Mon code ne marche pas"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(48,209,88,0.08);"><strong style="color:#30d158;">FORT</strong><br><span style="font-size:13px;">"Erreur + contexte + handler + message exact"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(255,107,107,0.08);"><strong style="color:#ff6b6b;">FAIBLE</strong><br><span style="font-size:13px;">"Explique les closures"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(48,209,88,0.08);"><strong style="color:#30d158;">FORT</strong><br><span style="font-size:13px;">"À un junior, analogie vestiaire, 2 exemples"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(255,107,107,0.08);"><strong style="color:#ff6b6b;">FAIBLE</strong><br><span style="font-size:13px;">"Améliore mon code"</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(48,209,88,0.08);"><strong style="color:#30d158;">FORT</strong><br><span style="font-size:13px;">"Refactore ce composant, sépare en sous-composants, ajoute les types"</span></div>
+        </div>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;">Prends un prompt faible récent. Réécris-le en prompt fort avec les 5 piliers. Teste les deux versions. Compare le résultat.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz-section" id="quiz">
+    <div class="quiz-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h2 style="margin:0;">✅ Quiz du Module 2</h2>
+          <p style="margin:4px 0 0;color:var(--muted);font-size:14px;">5 questions · Score minimum 70%</p>
+        </div>
+        <span id="quizProgress" style="color:var(--muted);font-size:14px;">0/5 répondues</span>
+      </div>
+      <div id="quizQuestions"></div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitQuiz()">✅ Valider le quiz</button>
+        <button class="btn btn-secondary" onclick="resetQuiz()">↺ Rejouer</button>
+      </div>
+      <div id="quizResult" class="quiz-result"></div>
+    </div>
+  </section>
+
+  <!-- OUTRO -->
+  <div class="module-outro">
+    <div>
+      <h3>🏁 Module 2 terminé ?</h3>
+      <p style="margin:4px 0 0;color:var(--muted);">Passe au Module 3 : Déboguer et refactorer avec méthode.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <span class="badge" id="completeBadge" style="cursor:default;">📋 0/3 leçons</span>
+      <a class="btn btn-primary" href="../Structure_des_coures_212ay.html#programme">📦 Voir Module 3</a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const quizData = [
+    { q:"Quels sont les 5 piliers d'un prompt fort ?", o:["Rôle, Contexte, Tâche, Format, Contrainte","Titre, Description, Code, Test, Doc","Nom, Date, Langage, IDE, Plugin","Bonjour, merci, stp, svp, cordialement"], c:0, j:"Les 5 piliers sont : Rôle (qui est l'IA), Contexte (stack), Tâche (quoi), Format (comment), Contrainte (limites)." },
+    { q:"Pourquoi \"Crée un formulaire React\" est un prompt faible ?", o:["Il est en français","Il manque le contexte : type de champs, style, validation, comportement attendu","React ne supporte pas les formulaires","Le mot formulaire est trop long"], c:1, j:"Un prompt faible ne donne pas assez de contraintes. L'IA doit deviner les champs, le style, la validation." },
+    { q:"Quel use case est idéal pour un prompt de boilerplate ?", o:["Débuguer une erreur complexe","Générer la structure complète d'un projet Next.js","Optimiser une requête SQL","Concevoir une architecture microservices"], c:1, j:"L'IA excelle dans les tâches répétitives et structurées comme les structures de projet, composants standards et routes CRUD." },
+    { q:"Quel est le meilleur prompt pour déboguer ?", o:["\"Mon code ne marche pas\"","Coller l'erreur + le contexte + le code concerné + ce que tu as déjà essayé","\"Il y a un bug\"","\"Debug ça\""], c:1, j:"Pour déboguer, donne le message d'erreur exact, le contexte (stack, versions), le code incriminé, et ce que tu as déjà testé." },
+    { q:"Que faire si l'IA génère du code qui semble correct mais que tu ne comprends pas ?", o:["L'utiliser quand même, l'IA est fiable","Le copier-coller et corriger si ça plante","Ne pas l'utiliser : demande d'abord une explication, comprends-le, puis décide","Le jeter et tout réécrire"], c:2, j:"Règle d'or : ne jamais utiliser du code que tu ne comprends pas. Demande à l'IA de t'expliquer d'abord." }
+  ];
+  let quizAnswers = {};
+  let completedLessons = new Set();
+
+  function switchLesson(n) {
+    document.querySelectorAll('.lesson-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.lesson-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelector(`.lesson-tab[data-lesson="${n}"]`).classList.add('active');
+    document.getElementById(`lesson${n}`).classList.add('active');
+  }
+  function switchFmt(l,f) {
+    document.querySelectorAll(`#lesson${l} .format-btn`).forEach(b=>b.classList.remove('active'));
+    document.querySelector(`#lesson${l} .format-btn[data-lf="${f}"]`).classList.add('active');
+    document.querySelectorAll(`#lesson${l} .lesson-body`).forEach(b=>b.classList.remove('active'));
+    document.getElementById(`l${l}-${f}`).classList.add('active');
+  }
+  function markComplete(n) {
+    completedLessons.has(n)?completedLessons.delete(n):completedLessons.add(n);
+    for(let i=1;i<=3;i++){ let b=document.getElementById(`c${i}badge`); if(b){ b.textContent=completedLessons.has(i)?'✅ Terminée':'○ Non terminée'; b.style.borderColor=completedLessons.has(i)?'rgba(48,209,88,0.3)':''; b.style.background=completedLessons.has(i)?'rgba(48,209,88,0.12)':''; b.style.color=completedLessons.has(i)?'#30d158':''; }}
+    updateProgress();
+  }
+  function updateProgress(){ let c=completedLessons.size; document.getElementById('progText').textContent=c+'/3 leçons'; document.getElementById('progPct').textContent=Math.round(c/3*100)+'%'; document.getElementById('progBar').style.width=Math.round(c/3*100)+'%'; document.getElementById('completeBadge').textContent='📋 '+c+'/3 leçons'; }
+  function renderQuiz(){ const el=document.getElementById('quizQuestions'); let h=''; quizData.forEach((q,i)=>{ h+=`<div class="quiz-question" data-qi="${i}"><div class="quiz-q-text">${i+1}. ${q.q}</div>`; q.o.forEach((o,j)=>{ let s=quizAnswers[i]===j?'selected':''; h+=`<div class="quiz-option ${s}" onclick="selectQuizOption(${i},${j})"><input type="radio" name="q${i}" value="${j}" ${quizAnswers[i]===j?'checked':''}><label>${o}</label></div>`; }); h+=`</div>`; }); el.innerHTML=h; document.getElementById('quizProgress').textContent=Object.keys(quizAnswers).length+'/'+quizData.length+' répondues'; }
+  function selectQuizOption(qi,oi){ quizAnswers[qi]=oi; renderQuiz(); }
+  function submitQuiz(){ if(Object.keys(quizAnswers).length<quizData.length){ alert('Réponds à toutes les questions'); return; } let correct=0; quizData.forEach((q,i)=>{ if(quizAnswers[i]===q.c) correct++; document.querySelectorAll(`.quiz-question[data-qi="${i}"] .quiz-option`).forEach((o,j)=>{ o.classList.remove('selected'); if(j===q.c) o.classList.add('correct'); if(j===quizAnswers[i]&&j!==q.c) o.classList.add('wrong'); }); }); let s=Math.round(correct/quizData.length*100); let p=s>=70; let r=document.getElementById('quizResult'); r.classList.add('show'); r.innerHTML=`<div class="quiz-score ${p?'pass':'fail'}">${p?'✅':'❌'} Score : ${s}% ${p?'— Réussite !':'— Minimum 70% requis'}</div><div style="text-align:center;margin:8px 0 16px;"><span style="color:var(--muted);">${correct}/${quizData.length} bonnes réponses</span></div>${quizData.map((q,i)=>`<div class="quiz-justify"><strong>${i+1}. ${q.q}</strong><br><span style="color:${quizAnswers[i]===q.c?'#30d158':'#ff6b6b'};">${quizAnswers[i]===q.c?'✅ Bonne réponse':'❌ Mauvaise réponse'}</span><br><em>Justification :</em> ${q.j}</div>`).join('')}${p?'<div style="text-align:center;margin-top:16px;"><span class="badge" style="cursor:default;">✅ Module 2 validé</span></div>':''}`; document.querySelectorAll('.quiz-option').forEach(e=>{e.style.cursor='default';e.querySelector('input').disabled=true;}); }
+  function resetQuiz(){ quizAnswers={}; document.getElementById('quizResult').classList.remove('show'); document.getElementById('quizResult').innerHTML=''; renderQuiz(); }
+  renderQuiz(); updateProgress();
+  document.querySelectorAll('.nav a').forEach(l=>{l.addEventListener('click',function(){document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));this.classList.add('active');});});
+</script>
+</body>
+</html>

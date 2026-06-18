@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M4 — Documentation, tests et workflow | 212ay.com</title>
+  <style>
+    :root { --bg:#081120; --bg-soft:#0d1830; --card:rgba(255,255,255,0.08); --border:rgba(255,255,255,0.12); --text:#eef4ff; --muted:#b8c4dc; --primary:#6d7cff; --secondary:#00c2a8; --accent:#9f7aea; --warning:#ffb454; --success:#30d158; --danger:#ff6b6b; --radius:20px; --container:1000px; }
+    * { box-sizing:border-box; } html { scroll-behavior:smooth; }
+    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:radial-gradient(circle at top left,rgba(109,124,255,0.18),transparent 25%),radial-gradient(circle at top right,rgba(0,194,168,0.14),transparent 20%),linear-gradient(180deg,#07111f 0%,#0a1326 100%); color:var(--text); line-height:1.6; }
+    .container { width:min(100% - 32px,var(--container)); margin:0 auto; }
+    .topbar { position:sticky; top:0; z-index:50; backdrop-filter:blur(16px); background:rgba(7,17,31,0.85); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .topbar-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .brand-badge { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; background:linear-gradient(135deg,var(--primary),var(--accent)); font-weight:900; font-size:14px; }
+    .nav { display:flex; gap:6px; flex-wrap:wrap; }
+    .nav a { padding:8px 14px; border-radius:999px; color:var(--muted); transition:0.25s; font-size:13px; text-decoration:none; }
+    .nav a:hover, .nav a.active { color:white; background:rgba(255,255,255,0.08); }
+    .hero { padding:40px 0 24px; }
+    .hero-card { padding:28px; border-radius:var(--radius); background:var(--card); border:1px solid var(--border); box-shadow:0 20px 60px rgba(0,0,0,0.35); }
+    .module-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; background:rgba(109,124,255,0.15); color:#b3c4ff; border:1px solid rgba(255,255,255,0.08); font-size:12px; font-weight:700; margin-bottom:12px; }
+    h1 { margin:0 0 8px; font-size:clamp(1.6rem,3vw,2.6rem); letter-spacing:-0.02em; }
+    .lead { margin:0 0 16px; color:var(--muted); font-size:1rem; }
+    .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); font-size:13px; color:#e8efff; }
+    .progress-bar { height:6px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; margin-top:8px; }
+    .progress-bar > span { display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--secondary),var(--primary)); border-radius:inherit; transition:width 0.5s ease; }
+    .lesson-tabs { display:flex; gap:8px; margin:20px 0; padding:6px; border-radius:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); overflow-x:auto; }
+    .lesson-tab { padding:12px 20px; border-radius:12px; border:none; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; font-size:14px; transition:0.2s; white-space:nowrap; }
+    .lesson-tab:hover { background:rgba(255,255,255,0.06); }
+    .lesson-tab.active { background:linear-gradient(135deg,rgba(109,124,255,0.2),rgba(159,122,234,0.2)); color:white; border:1px solid rgba(255,255,255,0.1); }
+    .lesson-panel { display:none; }
+    .lesson-panel.active { display:block; }
+    .format-bar { display:flex; gap:8px; margin-bottom:16px; padding:6px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); width:fit-content; }
+    .format-btn { padding:8px 16px; border-radius:10px; border:none; background:transparent; color:var(--muted); cursor:pointer; font-weight:700; font-size:13px; transition:0.2s; }
+    .format-btn.active { background:linear-gradient(135deg,rgba(109,124,255,0.22),rgba(159,122,234,0.22)); color:white; border:1px solid rgba(255,255,255,0.1); }
+    .lesson-body { display:none; }
+    .lesson-body.active { display:block; }
+    .lesson-body h4 { margin:20px 0 8px; color:#b3c4ff; }
+    .lesson-body pre, .code-block { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; overflow-x:auto; font-family:'JetBrains Mono','Fira Code',monospace; font-size:13px; line-height:1.5; color:#c9d4ff; }
+    .tag { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; margin-right:6px; }
+    .tag-h { background:rgba(255,180,84,0.2); color:#ffb454; }
+    .tag-c { background:rgba(109,124,255,0.2); color:#6d7cff; }
+    .tag-d { background:rgba(0,194,168,0.2); color:#00c2a8; }
+    .tag-a { background:rgba(159,122,234,0.2); color:#9f7aea; }
+    .action-box { margin:20px 0; padding:20px; border-radius:16px; background:rgba(159,122,234,0.08); border:1px solid rgba(159,122,234,0.15); }
+    .quiz-section { padding:32px 0 48px; }
+    .quiz-card { padding:24px; border-radius:var(--radius); background:var(--card); border:1px solid var(--border); }
+    .quiz-question { margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); }
+    .quiz-question:last-child { border-bottom:none; }
+    .quiz-q-text { font-weight:700; margin-bottom:10px; font-size:15px; }
+    .quiz-option { display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); cursor:pointer; transition:0.2s; }
+    .quiz-option:hover { background:rgba(255,255,255,0.07); }
+    .quiz-option.selected { border-color:var(--primary); background:rgba(109,124,255,0.12); }
+    .quiz-option.correct { border-color:var(--success); background:rgba(48,209,88,0.12); }
+    .quiz-option.wrong { border-color:var(--danger); background:rgba(255,107,107,0.12); }
+    .quiz-option input[type="radio"] { accent-color:var(--primary); }
+    .btn { border:none; border-radius:12px; padding:12px 20px; cursor:pointer; font-weight:700; transition:0.2s; text-decoration:none; display:inline-block; }
+    .btn-primary { background:linear-gradient(135deg,var(--primary),var(--accent)); color:#fff; box-shadow:0 8px 24px rgba(109,124,255,0.3); }
+    .btn-primary:hover { transform:translateY(-1px); }
+    .btn-secondary { background:rgba(255,255,255,0.08); color:white; border:1px solid rgba(255,255,255,0.12); }
+    .quiz-result { display:none; margin-top:16px; }
+    .quiz-result.show { display:block; }
+    .quiz-score { font-size:24px; font-weight:800; text-align:center; padding:16px; border-radius:14px; }
+    .quiz-score.pass { background:rgba(48,209,88,0.12); color:var(--success); }
+    .quiz-score.fail { background:rgba(255,107,107,0.12); color:var(--danger); }
+    .quiz-justify { margin-top:10px; padding:12px; border-radius:10px; background:rgba(255,255,255,0.03); border-left:3px solid var(--primary); font-size:14px; color:var(--muted); }
+    .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:rgba(48,209,88,0.1); color:#d6ffe2; border:1px solid rgba(48,209,88,0.18); font-size:13px; font-weight:700; cursor:pointer; }
+    .module-outro { margin-top:32px; padding:24px; border-radius:var(--radius); background:linear-gradient(135deg,rgba(109,124,255,0.12),rgba(0,194,168,0.08)); border:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+    .module-outro h3 { margin:0; }
+    .workflow-step { display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); margin-bottom:8px; }
+    .workflow-time { font-size:12px; font-weight:700; color:var(--primary); min-width:70px; }
+    @media (max-width:640px) { .hero-card { padding:20px; } }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <div class="brand-badge">212</div>
+      <div>
+        <div style="font-size:14px;">212ay.com</div>
+        <small style="color:var(--muted);font-size:11px;">Parcours : Vibe Coding</small>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#hero" class="active">Leçons</a>
+      <a href="#quiz">Quiz</a>
+      <a href="../Structure_des_coures_212ay.html">← Retour cours</a>
+    </nav>
+  </div>
+</div>
+<main class="container">
+  <section class="hero" id="hero">
+    <div class="hero-card">
+      <div class="module-badge">📦 Module 4 — Final</div>
+      <h1>Documentation, tests et workflow final</h1>
+      <p class="lead">Automatise ta documentation, génère des tests unitaires avec l'IA, et assemble tout dans un workflow de productivité complet.</p>
+      <div class="meta-row">
+        <span class="pill">⏱️ 35 min</span>
+        <span class="pill">📖 3 leçons</span>
+        <span class="pill">✅ Quiz final</span>
+        <span class="pill">🏆 Certificat</span>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);"><span id="progText">0/3 leçons</span><span id="progPct">0%</span></div>
+        <div class="progress-bar"><span id="progBar"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lesson-tabs">
+    <button class="lesson-tab active" data-lesson="1" onclick="switchLesson(1)">📖 4.1 — Documentation</button>
+    <button class="lesson-tab" data-lesson="2" onclick="switchLesson(2)">📖 4.2 — Tests unitaires</button>
+    <button class="lesson-tab" data-lesson="3" onclick="switchLesson(3)">📖 4.3 — Workflow complet</button>
+  </div>
+
+  <!-- 4.1 -->
+  <div class="lesson-panel active" id="lesson1">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(1,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(1,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(1,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l1-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);"><div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 12 min</div></div></div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M4-Lecon4.1/01-script-video.md" target="_blank">📄 Script</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 12 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(1)" id="c1badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l1-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);"><div style="font-size:40px;">🎧</div><div style="font-weight:700;">Audio — 12 min</div><div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div></div>
+    </div>
+    <div class="lesson-body" id="l1-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"><span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span></div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu finis un projet, tu remets la doc à plus tard — et dans 3 mois, plus personne ne comprend le code. L'IA peut générer une doc complète en 30 secondes.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — 3 types de doc</span>
+        <p style="margin:8px 0 0;color:var(--muted);"><strong>README</strong> — présentation, installation, endpoints<br><strong>JSDoc/TSDoc</strong> — documentation inline des fonctions<br><strong>OpenAPI</strong> — spec complète des routes</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo</span>
+        <p style="margin:8px 0 0;color:var(--muted);">"Génère un README.md pour mon API Express avec installation, endpoints, exemples." → README complet en 10 sec.<br><br>"Génère une spec OpenAPI 3.0 pour ces routes" → YAML prêt à l'emploi.</p>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;">Prends un projet. Colle le code dans ChatGPT. Demande un README complet. Publie-le.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.2 -->
+  <div class="lesson-panel" id="lesson2">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(2,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(2,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(2,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l2-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);"><div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 12 min</div></div></div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M4-Lecon4.2/01-script-video.md" target="_blank">📄 Script</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 12 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(2)" id="c2badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l2-aud"><div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);"><div style="font-size:40px;">🎧</div><div style="font-weight:700;">Audio — 12 min</div><div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️</button></div></div></div>
+    <div class="lesson-body" id="l2-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"><span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span></div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu sais que tu devrais écrire des tests. L'IA peut générer une base complète en quelques secondes — tu n'as plus d'excuse.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tests unitaires (Vitest), tests d'API (Supertest), tests composants (RTL). L'IA génère la structure, tu ajustes les edge cases.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo</span>
+        <p style="margin:8px 0 0;color:var(--muted);">"Génère des tests Vitest pour cette fonction : cas normal, chaîne vide, null, caractères spéciaux" → tests prêts en 10 sec.</p>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;">Prends une fonction. Fais générer des tests. Exécute-les. Corrige.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.3 -->
+  <div class="lesson-panel" id="lesson3">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(3,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(3,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(3,'txt')">📖 Texte</button>
+    </div>
+    <div class="lesson-body active" id="l3-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);"><div style="text-align:center;color:var(--muted);"><div style="font-size:40px;">🎬</div><div style="font-weight:700;">Lecteur vidéo — 12 min</div></div></div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;" href="M4-Lecon4.3/01-script-video.md" target="_blank">📄 Script</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 12 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="event.stopPropagation();markComplete(3)" id="c3badge">○ Non terminée</span>
+      </div>
+    </div>
+    <div class="lesson-body" id="l3-aud"><div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);"><div style="font-size:40px;">🎧</div><div style="font-weight:700;">Audio — 12 min</div><div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️</button></div></div></div>
+    <div class="lesson-body" id="l3-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"><span class="tag tag-h">H</span><span class="tag tag-c">C</span><span class="tag tag-d">D</span><span class="tag tag-a">A</span></div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">On a vu chaque outil séparément. Maintenant, on assemble tout dans un workflow quotidien que tu peux appliquer dès demain.</p>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — Workflow idéal</span>
+        <div class="workflow-step"><span class="workflow-time">☀️ 30 min</span><span style="color:var(--muted);">Planifier avec Claude</span></div>
+        <div class="workflow-step"><span class="workflow-time">💻 2h</span><span style="color:var(--muted);">Coder avec Copilot</span></div>
+        <div class="workflow-step"><span class="workflow-time">🐛 30 min</span><span style="color:var(--muted);">Debug avec Cursor</span></div>
+        <div class="workflow-step"><span class="workflow-time">📝 1h</span><span style="color:var(--muted);">Tests + Doc avec ChatGPT</span></div>
+        <div class="workflow-step"><span class="workflow-time">👁️ 30 min</span><span style="color:var(--muted);">Revue + Commit</span></div>
+      </div>
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo</span>
+        <p style="margin:8px 0 0;color:var(--muted);">On reprend le projet Task API du M1 et on exécute les 5 étapes : Claude (plan) → Copilot (code) → Cursor (debug) → ChatGPT (doc+tests) → Revue.</p>
+      </div>
+      <div class="action-box">
+        <span class="tag tag-a">Action finale</span>
+        <p style="margin:8px 0 0;">Prends un mini-projet. Exécute le workflow complet. Note le temps total gagné.</p>
+        <p style="margin:8px 0 0;color:var(--success);font-weight:700;">🎉 Félicitations — Tu as terminé le cours !</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <section class="quiz-section" id="quiz">
+    <div class="quiz-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div><h2 style="margin:0;">✅ Quiz Final — Module 4</h2><p style="margin:4px 0 0;color:var(--muted);font-size:14px;">4 questions · Score minimum 70%</p></div>
+        <span id="quizProgress" style="color:var(--muted);font-size:14px;">0/4 répondues</span>
+      </div>
+      <div id="quizQuestions"></div>
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitQuiz()">✅ Valider</button>
+        <button class="btn btn-secondary" onclick="resetQuiz()">↺ Rejouer</button>
+      </div>
+      <div id="quizResult" class="quiz-result"></div>
+    </div>
+  </section>
+
+  <div class="module-outro">
+    <div>
+      <h3>🏁 Cours terminé !</h3>
+      <p style="margin:4px 0 0;color:var(--muted);">Tu as complété les 4 modules du parcours "Comment l'IA peut t'aider à faire du Vibe Coding".</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <span class="badge" id="completeBadge" style="cursor:default;">📋 0/3 leçons</span>
+      <a class="btn btn-primary" href="../Structure_des_coures_212ay.html">🏆 Voir certificat</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  const quizData = [
+    { q:"Quel type de documentation l'IA peut-elle générer facilement ?", o:["README, JSDoc, OpenAPI","Diagrammes UML","Vidéos tutoriel","Traductions"], c:0, j:"L'IA excelle dans la génération de README, documentation inline (JSDoc) et specs d'API." },
+    { q:"Quelle est la bonne approche pour les tests générés par IA ?", o:["Les utiliser sans les exécuter","Générer + exécuter + ajuster les edge cases","Ne jamais utiliser de tests IA","Les copier-coller sans lire"], c:1, j:"Toujours exécuter les tests générés et ajuster les cas limites que l'IA aurait pu oublier." },
+    { q:"Quel est le premier outil à utiliser dans le workflow idéal ?", o:["Copilot pour coder","ChatGPT pour les tests","Claude pour planifier","Cursor pour debug"], c:2, j:"Le workflow commence par la planification avec Claude/ChatGPT. D'abord réfléchir, ensuite coder." },
+    { q:"Quelle est la règle d'or de tout le cours ?", o:["Toujours utiliser le dernier modèle","L'IA écrit le code, toi tu décides ce qui est bon","Ne jamais relire le code généré","Utiliser un seul outil"], c:1, j:"Règle d'or du cours : l'IA est un accélérateur, pas un substitut. Tu restes le décideur final." }
+  ];
+  let qA={}, cL=new Set();
+  function switchLesson(n){ document.querySelectorAll('.lesson-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.lesson-panel').forEach(p=>p.classList.remove('active')); document.querySelector(`.lesson-tab[data-lesson="${n}"]`).classList.add('active'); document.getElementById(`lesson${n}`).classList.add('active'); }
+  function switchFmt(l,f){ document.querySelectorAll(`#lesson${l} .format-btn`).forEach(b=>b.classList.remove('active')); document.querySelector(`#lesson${l} .format-btn[data-lf="${f}"]`).classList.add('active'); document.querySelectorAll(`#lesson${l} .lesson-body`).forEach(b=>b.classList.remove('active')); document.getElementById(`l${l}-${f}`).classList.add('active'); }
+  function markComplete(n){ cL.has(n)?cL.delete(n):cL.add(n); for(let i=1;i<=3;i++){let b=document.getElementById(`c${i}badge`);if(b){b.textContent=cL.has(i)?'✅ Terminée':'○ Non terminée';b.style.borderColor=cL.has(i)?'rgba(48,209,88,0.3)':'';b.style.background=cL.has(i)?'rgba(48,209,88,0.12)':'';b.style.color=cL.has(i)?'#30d158':'';}} updateProgress(); }
+  function updateProgress(){let c=cL.size;document.getElementById('progText').textContent=c+'/3 leçons';document.getElementById('progPct').textContent=Math.round(c/3*100)+'%';document.getElementById('progBar').style.width=Math.round(c/3*100)+'%';document.getElementById('completeBadge').textContent='📋 '+c+'/3 leçons';}
+  function renderQuiz(){const el=document.getElementById('quizQuestions');let h='';quizData.forEach((q,i)=>{h+=`<div class="quiz-question" data-qi="${i}"><div class="quiz-q-text">${i+1}. ${q.q}</div>`;q.o.forEach((o,j)=>{h+=`<div class="quiz-option ${qA[i]===j?'selected':''}" onclick="selectQuizOption(${i},${j})"><input type="radio" name="q${i}" value="${j}" ${qA[i]===j?'checked':''}><label>${o}</label></div>`;});h+=`</div>`;});el.innerHTML=h;document.getElementById('quizProgress').textContent=Object.keys(qA).length+'/'+quizData.length+' répondues';}
+  function selectQuizOption(qi,oi){qA[qi]=oi;renderQuiz();}
+  function submitQuiz(){if(Object.keys(qA).length<quizData.length){alert('Réponds à toutes les questions');return;}let c=0;quizData.forEach((q,i)=>{if(qA[i]===q.c)c++;document.querySelectorAll(`.quiz-question[data-qi="${i}"] .quiz-option`).forEach((o,j)=>{o.classList.remove('selected');if(j===q.c)o.classList.add('correct');if(j===qA[i]&&j!==q.c)o.classList.add('wrong');});});let s=Math.round(c/quizData.length*100),p=s>=70,r=document.getElementById('quizResult');r.classList.add('show');r.innerHTML=`<div class="quiz-score ${p?'pass':'fail'}">${p?'✅':'❌'} Score : ${s}% ${p?'— Réussite !':'— 70% requis'}</div><div style="text-align:center;margin:8px 0 16px;"><span style="color:var(--muted);">${c}/${quizData.length} bonnes</span></div>${quizData.map((q,i)=>`<div class="quiz-justify"><strong>${i+1}. ${q.q}</strong><br><span style="color:${qA[i]===q.c?'#30d158':'#ff6b6b'};">${qA[i]===q.c?'✅ Bonne':'❌ Mauvaise'}</span><br><em>Justification :</em> ${q.j}</div>`).join('')}${p?'<div style="text-align:center;margin-top:16px;"><span class="badge" style="cursor:default;">✅ Module 4 validé — Cours terminé !</span></div>':''}`;document.querySelectorAll('.quiz-option').forEach(e=>{e.style.cursor='default';e.querySelector('input').disabled=true;});}
+  function resetQuiz(){qA={};document.getElementById('quizResult').classList.remove('show');document.getElementById('quizResult').innerHTML='';renderQuiz();}
+  renderQuiz();updateProgress();
+</script>
+</body>
+</html>

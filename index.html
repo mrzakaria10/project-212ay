@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>212ay - Vibe Coding</title>
+  <style>
+    :root {
+      --bg: #081120;
+      --bg-soft: #0d1830;
+      --card: rgba(255,255,255,0.08);
+      --card-strong: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.12);
+      --text: #eef4ff;
+      --muted: #b8c4dc;
+      --primary: #6d7cff;
+      --secondary: #00c2a8;
+      --accent: #9f7aea;
+      --warning: #ffb454;
+      --success: #30d158;
+      --danger: #ff6b6b;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+      --radius: 20px;
+      --container: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(109,124,255,0.2), transparent 25%),
+        radial-gradient(circle at top right, rgba(0,194,168,0.16), transparent 20%),
+        linear-gradient(180deg, #07111f 0%, #0a1326 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(100% - 32px, var(--container));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(7, 17, 31, 0.75);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: var(--shadow);
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      transition: 0.25s ease;
+      font-size: 14px;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: white;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .hero {
+      padding: 72px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+    }
+
+    .hero-main {
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(109,124,255,0.35), transparent 65%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      color: #d8e1f7;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(2rem, 4vw, 3.6rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p.lead {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 1.06rem;
+      max-width: 760px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e8efff;
+      font-size: 14px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(109,124,255,0.35);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero-side {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .stat-title {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .progress-wrapper {
+      margin-top: 8px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      border-radius: inherit;
+    }
+
+    section {
+      padding: 24px 0 10px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .grid-3, .grid-4, .grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .audience-list, .results-list, .deliverables-list, .lesson-points {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .audience-list li,
+    .results-list li,
+    .deliverables-list li,
+    .lesson-points li {
+      margin-bottom: 10px;
+    }
+
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .toggle-group {
+      display: inline-flex;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .toggle-btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: linear-gradient(135deg, rgba(109,124,255,0.22), rgba(159,122,234,0.22));
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .modules {
+      display: grid;
+      gap: 18px;
+    }
+
+    .module-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: 0.2s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    .module-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      padding: 22px 22px 14px;
+      cursor: pointer;
+    }
+
+    .module-left {
+      display: flex;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .module-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, rgba(109,124,255,0.22), rgba(0,194,168,0.22));
+      border: 1px solid rgba(255,255,255,0.12);
+      flex-shrink: 0;
+    }
+
+    .module-head h3 {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+    }
+
+    .module-meta {
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .chevron {
+      font-size: 20px;
+      color: var(--muted);
+      transition: transform 0.2s ease;
+    }
+
+    .module-card.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .module-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+      border-top: 1px solid transparent;
+    }
+
+    .module-card.open .module-body {
+      border-top-color: rgba(255,255,255,0.08);
+    }
+
+    .module-inner {
+      padding: 18px 22px 22px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .lesson-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .lesson-item {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .lesson-item h4 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .lesson-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .module-side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .mini-box {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mini-box strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .hcda-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .hcda-step {
+      padding: 20px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .hcda-step .tag {
+      display: inline-block;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(109,124,255,0.16);
+      color: #dfe5ff;
+      font-size: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .format-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .format-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .format-card.selected {
+      border-color: rgba(109,124,255,0.45);
+      box-shadow: 0 20px 50px rgba(109,124,255,0.18);
+    }
+
+    .format-icon {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .journey {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .journey-step {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #e9efff;
+      font-size: 14px;
+    }
+
+    .journey-arrow {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .validation-card {
+      position: relative;
+    }
+
+    .validation-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 22px 0 22px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      opacity: 0.65;
+    }
+
+    .project-highlight {
+      padding: 26px;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(109,124,255,0.12), rgba(0,194,168,0.08)),
+        rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+    }
+
+    .cert-box {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .certificate-preview {
+      padding: 26px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.12);
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .certificate-preview::before,
+    .certificate-preview::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(109,124,255,0.25), transparent 65%);
+      width: 180px;
+      height: 180px;
+    }
+
+    .certificate-preview::before {
+      top: -40px;
+      right: -30px;
+    }
+
+    .certificate-preview::after {
+      left: -40px;
+      bottom: -60px;
+    }
+
+    .certificate-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 10px 0 8px;
+    }
+
+    .cert-id {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      margin-top: 12px;
+      font-size: 13px;
+      color: #dfe6fb;
+    }
+
+    /* ── Lesson Viewer Overlay ── */
+    .lesson-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(7, 17, 31, 0.92);
+      backdrop-filter: blur(8px);
+      overflow-y: auto;
+      padding: 24px 16px;
+    }
+    .lesson-overlay.open { display: block; }
+    .lesson-panel {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #0d1830;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .lesson-close {
+      position: absolute;
+      top: 16px; right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .lesson-close:hover { background: rgba(255,255,255,0.2); }
+    .lesson-format-bar {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0 20px;
+      padding: 8px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      width: fit-content;
+    }
+    .lesson-format-btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+    .lesson-format-btn.active {
+      background: linear-gradient(135deg, rgba(109,124,255,0.22), rgba(159,122,234,0.22));
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .lesson-content { display: none; margin-top: 16px; }
+    .lesson-content.active { display: block; }
+    .lesson-content pre {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .lesson-content code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      color: #b3c4ff;
+    }
+    .lesson-content h3 { margin: 24px 0 12px; }
+    .lesson-content h4 { margin: 20px 0 8px; color: #b3c4ff; }
+    .lesson-content .hcda-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    .hcda-tag.h { background: rgba(255,180,84,0.2); color: #ffb454; }
+    .hcda-tag.c { background: rgba(109,124,255,0.2); color: #6d7cff; }
+    .hcda-tag.d { background: rgba(0,194,168,0.2); color: #00c2a8; }
+    .hcda-tag.a { background: rgba(159,122,234,0.2); color: #9f7aea; }
+    .lesson-action-box {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(159,122,234,0.1);
+      border: 1px solid rgba(159,122,234,0.2);
+    }
+    .lesson-complete-btn {
+      display: block;
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #30d158, #00c2a8);
+      color: #000;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .lesson-complete-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+
+    /* ── Interactive Quiz ── */
+    .quiz-container {
+      margin-top: 16px;
+      padding: 20px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .quiz-question {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .quiz-question:last-child { border-bottom: none; margin-bottom: 0; }
+    .quiz-q-text {
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255,255,255,0.08); }
+    .quiz-option.selected { border-color: var(--primary); background: rgba(109,124,255,0.12); }
+    .quiz-option.correct { border-color: #30d158; background: rgba(48,209,88,0.12); }
+    .quiz-option.wrong { border-color: #ff6b6b; background: rgba(255,107,107,0.12); }
+    .quiz-option input[type="radio"] { accent-color: var(--primary); }
+    .quiz-option label { cursor: pointer; flex: 1; }
+    .quiz-result {
+      margin-top: 12px;
+      display: none;
+    }
+    .quiz-result.show { display: block; }
+    .quiz-score {
+      font-size: 28px;
+      font-weight: 800;
+      text-align: center;
+      padding: 16px;
+      border-radius: 14px;
+    }
+    .quiz-score.pass { background: rgba(48,209,88,0.12); color: #30d158; }
+    .quiz-score.fail { background: rgba(255,107,107,0.12); color: #ff6b6b; }
+    .quiz-justification {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid var(--primary);
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .faq-item {
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .faq-question {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: white;
+      text-align: left;
+      padding: 18px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 1rem;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+      color: var(--muted);
+      padding: 0 20px;
+    }
+
+    .faq-item.open .faq-answer {
+      padding: 0 20px 18px;
+    }
+
+    .faq-item.open .faq-question span:last-child {
+      transform: rotate(180deg);
+    }
+
+    .faq-question span:last-child {
+      transition: transform 0.2s ease;
+      color: var(--muted);
+    }
+
+    .cta {
+      margin: 34px 0 60px;
+      padding: 28px;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(109,124,255,0.18), rgba(159,122,234,0.16)),
+        rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .cta p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 700px;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 14px;
+      padding-bottom: 50px;
+    }
+
+    .badge-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(48,209,88,0.1);
+      color: #d6ffe2;
+      border: 1px solid rgba(48,209,88,0.18);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hidden-lang {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .module-inner,
+      .cert-box,
+      .grid-4,
+      .grid-3,
+      .grid-2,
+      .hcda-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .module-head {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-main, .hero-side, .card, .project-highlight, .certificate-preview {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .module-head {
+        padding: 18px;
+      }
+
+      .module-inner {
+        padding: 16px 18px 18px;
+      }
+
+      .cta {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">212</div>
+        <div>
+          <div>212ay.com</div>
+          <small style="color: var(--muted);">Course Experience Demo</small>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="#overview" class="active">Overview</a>
+        <a href="#programme">Programme</a>
+        <a href="#formats">Formats</a>
+        <a href="#validation">Validation</a>
+        <a href="#project">Projet</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" id="overview">
+      <div class="hero-grid">
+        <div class="hero-main glass">
+          <div class="eyebrow">🚀 Parcours guidé • Vidéo, Audio, Texte • Certificat</div>
+
+          <h1 id="courseTitle">Comment l’IA peut vous aider à faire du Vibe Coding</h1>
+
+          <p class="lead" id="courseDesc">
+            Codez plus vite, mieux et de façon plus intelligente grâce à une méthode pratique
+            qui vous aide à générer du code, corriger des bugs, améliorer vos composants
+            et finaliser vos projets plus proprement.
+          </p>
+
+          <div class="meta-row">
+            <div class="pill">💻 Intermédiaire</div>
+            <div class="pill">⏱️ 3h00</div>
+            <div class="pill">📦 4 modules + projet final</div>
+            <div class="pill">🏆 Certificat inclus</div>
+            <div class="pill">🌐 FR / AR / EN</div>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="scrollToSection('programme')">Commencer le cours</button>
+            <button class="btn btn-secondary" onclick="scrollToSection('programme')">Voir le programme</button>
+          </div>
+
+          <div class="helper">
+            Choisissez votre langue, votre format préféré, puis avancez module par module
+            jusqu’au projet final et au certificat.
+          </div>
+        </div>
+
+        <aside class="hero-side glass">
+          <div class="stat-card">
+            <div class="stat-title">Progression estimée du parcours</div>
+            <div class="stat-value">4 Modules</div>
+            <div class="progress-wrapper">
+              <div class="progress-label">
+                <span>Parcours guidé</span>
+                <span>Quiz à chaque étape</span>
+              </div>
+              <div class="progress"><span></span></div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Choix de langue</div>
+            <div class="controls-bar" style="margin-bottom:0;">
+              <div class="toggle-group" id="langToggle">
+                <button class="toggle-btn active" data-lang="fr">FR</button>
+                <button class="toggle-btn" data-lang="ar">AR</button>
+                <button class="toggle-btn" data-lang="en">EN</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Choix de format</div>
+            <div class="controls-bar" style="margin-bottom:0;">
+              <div class="toggle-group" id="formatToggle">
+                <button class="toggle-btn active" data-format="video">Vidéo</button>
+                <button class="toggle-btn" data-format="audio">Audio</button>
+                <button class="toggle-btn" data-format="text">Texte</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Conditions de réussite</div>
+            <div class="badge-inline">✅ Score minimum : 70%</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Pourquoi suivre ce parcours</h2>
+          <p>
+            Ce cours transforme un simple contenu en parcours structuré avec progression visible,
+            validation par quiz et résultat concret à la fin.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <h3>Apprentissage guidé</h3>
+          <p>Une logique claire du début à la fin : découvrir, pratiquer, valider, livrer.</p>
+        </article>
+        <article class="card">
+          <h3>Orientation pratique</h3>
+          <p>Chaque module se concentre sur des situations réelles de travail et de production.</p>
+        </article>
+        <article class="card">
+          <h3>Résultat valorisable</h3>
+          <p>Le parcours se termine par un projet final et un certificat partageable.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Pour qui est ce cours</h2>
+          <p>Conçu pour un public tech qui veut progresser avec une structure simple et efficace.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <ul class="audience-list">
+          <li>Développeurs juniors qui veulent coder plus efficacement.</li>
+          <li>Étudiants en informatique qui veulent mieux structurer leurs projets.</li>
+          <li>Freelancers ou porteurs de projets qui veulent livrer plus proprement.</li>
+          <li>Apprenants qui préfèrent un parcours avec modules, quiz et projet final.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>À la fin du parcours</h2>
+          <p>Les compétences finales sont visibles, concrètes et reliées à la pratique.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <article class="card">
+          <ul class="results-list">
+            <li>Comprendre les principaux outils et leurs cas d’usage.</li>
+            <li>Rédiger de meilleures instructions pour obtenir un code plus utile.</li>
+            <li>Corriger un bug avec une méthode plus claire.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <ul class="results-list">
+            <li>Refactorer un composant existant plus proprement.</li>
+            <li>Préparer documentation et tests de base.</li>
+            <li>Construire un mini-projet plus structuré et présentable.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="programme">
+      <div class="section-head">
+        <div>
+          <h2>Programme du parcours</h2>
+          <p>
+            Le cours suit la progression officielle : module, leçon, quiz, projet final, puis certificat.
+          </p>
+        </div>
+      </div>
+
+      <div class="modules">
+        <article class="module-card open">
+          <div class="module-head" onclick="toggleModule(this)">
+            <div class="module-left">
+              <div class="module-number">M1</div>
+              <div>
+                <h3>Comprendre l’IA pour les développeurs</h3>
+                <div class="module-meta">
+                  <span>⏱️ 35 min</span>
+                  <span>🎯 Comprendre les outils, cas d’usage et limites</span>
+                </div>
+              </div>
+            </div>
+            <div class="chevron">⌄</div>
+          </div>
+
+          <div class="module-body">
+            <div class="module-inner">
+                <div class="lesson-list">
+                  <a href="cours-pilote/M1-comprendre-IA.html" style="text-decoration:none;color:inherit;">
+                    <div class="lesson-item" style="cursor:pointer;">
+                      <h4>📖 Leçon 1.1 — Panorama des outils</h4>
+                      <p>Découvrir les principaux outils pour les développeurs et leurs différences.</p>
+                    </div>
+                  </a>
+                  <a href="cours-pilote/M1-comprendre-IA.html" style="text-decoration:none;color:inherit;">
+                    <div class="lesson-item" style="cursor:pointer; opacity:0.5;">
+                      <h4>🔒 Leçon 1.2 — Cas d'usage concrets</h4>
+                      <p>Observer comment ces outils s'intègrent dans un projet web réel.</p>
+                    </div>
+                  </a>
+                  <a href="cours-pilote/M1-comprendre-IA.html" style="text-decoration:none;color:inherit;">
+                    <div class="lesson-item" style="cursor:pointer; opacity:0.5;">
+                      <h4>🔒 Leçon 1.3 — Limites et bonnes pratiques</h4>
+                      <p>Comprendre les erreurs fréquentes et apprendre à garder un esprit critique.</p>
+                    </div>
+                  </a>
+                </div>
+                <div class="lesson-item" onclick="openLesson('M1-L1-2')" style="cursor:pointer;">
+                  <h4>📖 Leçon 1.2 — Cas d'usage concrets</h4>
+                  <p>Observer comment ces outils s'intègrent dans un projet web réel.</p>
+                </div>
+                <div class="lesson-item" style="cursor:pointer; opacity:0.5;">
+                  <h4>🔒 Leçon 1.3 — Limites et bonnes pratiques</h4>
+                  <p>Comprendre les erreurs fréquentes et apprendre à garder un esprit critique.</p>
+                </div>
+              </div>
+
+              <div class="module-side">
+                <div class="mini-box" style="border-color:rgba(109,124,255,0.3);">
+                  <strong>✅ Quiz du module 1</strong>
+                  <p style="margin:8px 0;color:var(--muted);font-size:14px;">4 questions · Score minimum 70%</p>
+                  <a class="btn btn-secondary" style="display:block;text-align:center;margin-top:4px;text-decoration:none;" href="cours-pilote/M1-comprendre-IA.html#quiz">Passer le quiz</a>
+                </div>
+                <div class="mini-box">
+                  <strong>Ce que l'apprenant fait</strong>
+                  Découvrir, comparer, vérifier et comprendre avant de produire.
+                </div>
+              </div>
+                <div class="lesson-item">
+                  <h4>Leçon 1.2 — Cas d’usage concrets</h4>
+                  <p>Observer comment ces outils s’intègrent dans un projet web réel.</p>
+                </div>
+                <div class="lesson-item">
+                  <h4>Leçon 1.3 — Limites et bonnes pratiques</h4>
+                  <p>Comprendre les erreurs fréquentes et apprendre à garder un esprit critique.</p>
+                </div>
+              </div>
+
+              <div class="module-side">
+                <div class="mini-box">
+                  <strong>Validation du module</strong>
+                  Quiz de 4 questions avec score minimum de 70%.
+                </div>
+                <div class="mini-box">
+                  <strong>Ce que l’apprenant fait</strong>
+                  Découvrir, comparer, vérifier et comprendre avant de produire.
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <div class="module-head" onclick="toggleModule(this)">
+            <div class="module-left">
+              <div class="module-number">M2</div>
+              <div>
+                <h3>Prompter efficacement pour générer du code</h3>
+                <div class="module-meta">
+                  <span>⏱️ 45 min</span>
+                  <span>🎯 Structurer des instructions techniques utiles</span>
+                </div>
+              </div>
+            </div>
+            <div class="chevron">⌄</div>
+          </div>
+
+          <div class="module-body">
+            <div class="module-inner">
+              <div class="lesson-list">
+                <a href="cours-pilote/M2-prompter.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;">
+                    <h4>📖 Leçon 2.1 — Anatomie d'un bon prompt</h4>
+                    <p>Comprendre comment construire une instruction claire, contextualisée et exploitable.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M2-prompter.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 2.2 — Générer du boilerplate utile</h4>
+                    <p>Créer une base de projet, un composant ou une structure de code cohérente.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M2-prompter.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 2.3 — Prompts faibles vs prompts forts</h4>
+                    <p>Comparer plusieurs formulations pour améliorer la qualité du résultat.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="module-side">
+                <div class="mini-box" style="border-color:rgba(109,124,255,0.3);">
+                  <strong>✅ Quiz du module 2</strong>
+                  <p style="margin:8px 0;color:var(--muted);font-size:14px;">5 questions · Score minimum 70%</p>
+                  <a class="btn btn-secondary" style="display:block;text-align:center;margin-top:4px;text-decoration:none;" href="cours-pilote/M2-prompter.html#quiz">Passer le quiz</a>
+                </div>
+                <div class="mini-box">
+                  <strong>Ce que l'apprenant fait</strong>
+                  Demander mieux, préciser davantage et produire un code plus propre.
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <div class="module-head" onclick="toggleModule(this)">
+            <div class="module-left">
+              <div class="module-number">M3</div>
+              <div>
+                <h3>Déboguer et refactorer avec méthode</h3>
+                <div class="module-meta">
+                  <span>⏱️ 45 min</span>
+                  <span>🎯 Corriger et améliorer un code existant</span>
+                </div>
+              </div>
+            </div>
+            <div class="chevron">⌄</div>
+          </div>
+
+          <div class="module-body">
+            <div class="module-inner">
+              <div class="lesson-list">
+                <a href="cours-pilote/M3-debug-refactor.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;">
+                    <h4>📖 Leçon 3.1 — Expliquer une erreur avec contexte</h4>
+                    <p>Présenter clairement un bug pour obtenir une aide plus pertinente.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M3-debug-refactor.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 3.2 — Refactorer un composant existant</h4>
+                    <p>Améliorer la lisibilité et la structure d'un composant sans casser l'existant.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M3-debug-refactor.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 3.3 — Optimiser structure et performance</h4>
+                    <p>Rendre le code plus propre, plus stable et plus simple à maintenir.</p>
+                  </div>
+                </a>
+              </div>
+
+              <div class="module-side">
+                <div class="mini-box" style="border-color:rgba(109,124,255,0.3);">
+                  <strong>✅ Quiz du module 3</strong>
+                  <p style="margin:8px 0;color:var(--muted);font-size:14px;">4 questions · Score minimum 70%</p>
+                  <a class="btn btn-secondary" style="display:block;text-align:center;margin-top:4px;text-decoration:none;" href="cours-pilote/M3-debug-refactor.html#quiz">Passer le quiz</a>
+                </div>
+                <div class="mini-box">
+                  <strong>Ce que l'apprenant fait</strong>
+                  Analyser, corriger, simplifier et améliorer progressivement.
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="module-card">
+          <div class="module-head" onclick="toggleModule(this)">
+            <div class="module-left">
+              <div class="module-number">M4</div>
+              <div>
+                <h3>Documentation, tests et workflow final</h3>
+                <div class="module-meta">
+                  <span>⏱️ 35 min</span>
+                  <span>🎯 Finaliser le travail proprement</span>
+                </div>
+              </div>
+            </div>
+            <div class="chevron">⌄</div>
+          </div>
+
+          <div class="module-body">
+            <div class="module-inner">
+              <div class="lesson-list">
+                <a href="cours-pilote/M4-doc-tests-workflow.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;">
+                    <h4>📖 Leçon 4.1 — Générer une documentation claire</h4>
+                    <p>Transformer le code en explication utile et lisible pour le projet.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M4-doc-tests-workflow.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 4.2 — Créer des tests unitaires de base</h4>
+                    <p>Ajouter une base de sécurité et de confiance dans le comportement du code.</p>
+                  </div>
+                </a>
+                <a href="cours-pilote/M4-doc-tests-workflow.html" style="text-decoration:none;color:inherit;">
+                  <div class="lesson-item" style="cursor:pointer;opacity:0.5;">
+                    <h4>🔒 Leçon 4.3 — Construire un workflow complet</h4>
+                    <p>Assembler logique de production, vérification et finalisation dans une routine claire.</p>
+                  </div>
+                </a>
+              </div>
+
+              <div class="module-side">
+                <div class="mini-box" style="border-color:rgba(109,124,255,0.3);">
+                  <strong>✅ Quiz du module 4</strong>
+                  <p style="margin:8px 0;color:var(--muted);font-size:14px;">4 questions · Score minimum 70%</p>
+                  <a class="btn btn-secondary" style="display:block;text-align:center;margin-top:4px;text-decoration:none;" href="cours-pilote/M4-doc-tests-workflow.html#quiz">Passer le quiz</a>
+                </div>
+                <div class="mini-box">
+                  <strong>Ce que l'apprenant fait</strong>
+                  Documenter, tester et mieux préparer la livraison d'un projet.
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Comment se déroule une leçon</h2>
+          <p>
+            Chaque leçon suit le modèle HCDA pour garder un rythme simple, cohérent et orienté pratique.
+          </p>
+        </div>
+      </div>
+
+      <div class="hcda-grid">
+        <article class="hcda-step">
+          <div class="tag">H — Hook</div>
+          <h3>Commencer par un problème</h3>
+          <p>La leçon démarre par une situation concrète que l’apprenant reconnaît immédiatement.</p>
+        </article>
+
+        <article class="hcda-step">
+          <div class="tag">C — Concept</div>
+          <h3>Expliquer simplement</h3>
+          <p>On présente l’idée principale avec des mots clairs, un exemple ou une analogie utile.</p>
+        </article>
+
+        <article class="hcda-step">
+          <div class="tag">D — Démo</div>
+          <h3>Montrer un cas réel</h3>
+          <p>On passe à une démonstration directe avec code, composant, bug ou workflow.</p>
+        </article>
+
+        <article class="hcda-step">
+          <div class="tag">A — Action</div>
+          <h3>Faire appliquer</h3>
+          <p>La leçon se termine par une tâche courte pour transformer la compréhension en pratique.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="formats">
+      <div class="section-head">
+        <div>
+          <h2>Choisissez votre format</h2>
+          <p>
+            La même leçon existe en vidéo, audio et texte, sans changer le fond pédagogique.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="card format-card selected" data-format-card="video">
+          <div class="format-icon">🎬</div>
+          <h3>Vidéo</h3>
+          <p>Format idéal pour démonstration visuelle, explications guidées et sous-titres.</p>
+        </article>
+
+        <article class="card format-card" data-format-card="audio">
+          <div class="format-icon">🎧</div>
+          <h3>Audio</h3>
+          <p>Format utile pour apprendre en déplacement et réécouter les idées essentielles.</p>
+        </article>
+
+        <article class="card format-card" data-format-card="text">
+          <div class="format-icon">📖</div>
+          <h3>Texte</h3>
+          <p>Format pratique pour relire, skimmer, copier des exemples et réviser rapidement.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Expérience d’apprentissage</h2>
+          <p>Le parcours guide l’utilisateur du choix du cours jusqu’au partage du certificat.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="journey">
+          <div class="journey-step">Découvrir le cours</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Choisir format</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Choisir langue</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Suivre les leçons</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Passer les quiz</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Soumettre le projet</div>
+          <div class="journey-arrow">→</div>
+          <div class="journey-step">Obtenir le certificat</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="validation">
+      <div class="section-head">
+        <div>
+          <h2>Validation du parcours</h2>
+          <p>
+            La progression repose sur quiz, score minimum, projet final et complétion des modules obligatoires.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <article class="card validation-card">
+          <h3>Quiz par module</h3>
+          <p>Chaque module se termine par un quiz de validation avec 3 à 5 questions.</p>
+        </article>
+
+        <article class="card validation-card">
+          <h3>Seuil de réussite</h3>
+          <p>Un score minimum de 70% est requis pour passer à l’étape suivante.</p>
+        </article>
+
+        <article class="card validation-card">
+          <h3>Projet final</h3>
+          <p>Le parcours se termine par un livrable concret appliquant les compétences du cours.</p>
+        </article>
+
+        <article class="card validation-card">
+          <h3>Certificat</h3>
+          <p>Le certificat est délivré après réussite complète du parcours et vérification finale.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="project">
+      <div class="section-head">
+        <div>
+          <h2>Projet final</h2>
+          <p>Un mini-projet permet de transformer l’apprentissage en résultat concret et partageable.</p>
+        </div>
+      </div>
+
+      <div class="project-highlight">
+        <h3 style="margin-top:0;">Mini-app complète orientée productivité développeur</h3>
+        <p style="color: var(--muted); margin-bottom: 16px;">
+          Le livrable final mobilise les éléments vus dans le parcours : structure, correction,
+          documentation, logique de tests et qualité de présentation.
+        </p>
+
+        <div class="grid-2">
+          <div class="card" style="background: rgba(255,255,255,0.04); box-shadow:none;">
+            <h3>Livrables attendus</h3>
+            <ul class="deliverables-list">
+              <li>Dépôt GitHub bien organisé.</li>
+              <li>Structure frontend claire.</li>
+              <li>Logique backend simple ou API de base.</li>
+              <li>Documentation courte et lisible.</li>
+              <li>Tests essentiels.</li>
+              <li>Rendu final présentable.</li>
+            </ul>
+          </div>
+
+          <div class="card" style="background: rgba(255,255,255,0.04); box-shadow:none;">
+            <h3>Pourquoi ce projet compte</h3>
+            <ul class="lesson-points">
+              <li>Il montre que l’apprenant ne s’est pas contenté de regarder.</li>
+              <li>Il transforme les leçons en production réelle.</li>
+              <li>Il donne un résultat montrable dans un contexte académique ou professionnel.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Certificat 212ay</h2>
+          <p>Le certificat final valorise le parcours terminé et la réussite des conditions demandées.</p>
+        </div>
+      </div>
+
+      <div class="cert-box">
+        <div class="certificate-preview">
+          <div class="eyebrow">🏆 Certificat de Réussite</div>
+          <div class="certificate-title">212ay.com</div>
+          <p style="max-width:520px; color:#eef4ff;">
+            Ce certificat est décerné à l’apprenant pour avoir complété avec succès le parcours
+            “Comment l’IA peut vous aider à faire du Vibe Coding”.
+          </p>
+          <div class="cert-id">ID : 212AY-2026-0042</div>
+        </div>
+
+        <div class="card">
+          <h3>Conditions d’obtention</h3>
+          <ul class="deliverables-list">
+            <li>Compléter 100% des modules obligatoires.</li>
+            <li>Obtenir au moins 70% au quiz final.</li>
+            <li>Soumettre le projet final si demandé.</li>
+            <li>Accepter les conditions d’émission du certificat.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="section-head">
+        <div>
+          <h2>Questions fréquentes</h2>
+          <p>Les réponses principales sont visibles directement dans la fiche du cours.</p>
+        </div>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item open">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Ce cours est-il adapté aux débutants complets ?</span>
+            <span>⌄</span>
+          </button>
+          <div class="faq-answer">
+            Il convient mieux aux apprenants ayant déjà une base en développement web ou en logique de projet.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Puis-je suivre uniquement la version texte ?</span>
+            <span>⌄</span>
+          </button>
+          <div class="faq-answer">
+            Oui. Le contenu reste cohérent entre les versions vidéo, audio et texte.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Le projet final est-il obligatoire ?</span>
+            <span>⌄</span>
+          </button>
+          <div class="faq-answer">
+            Oui, lorsqu’il fait partie des conditions de validation et d’obtention du certificat.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span>Le certificat peut-il être partagé ?</span>
+            <span>⌄</span>
+          </button>
+          <div class="faq-answer">
+            Oui. Il peut être téléchargé, partagé et vérifié publiquement via son identifiant unique.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta">
+      <div>
+        <h2 style="margin:0;">Prêt à commencer ?</h2>
+        <p>
+          Sélectionnez votre langue, choisissez votre format et avancez étape par étape
+          vers un parcours plus structuré, plus pratique et plus valorisable.
+        </p>
+      </div>
+
+      <div class="hero-actions" style="margin:0;">
+        <button class="btn btn-primary" onclick="alert('Inscription simulée')">Commencer maintenant</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('faq')">Voir les questions</button>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      Note de production : la page suit la structure recommandée pour 212ay avec hero,
+      programme, formats synchronisés, quiz par module, projet final et certificat.
+    </p>
+
+    <!-- ── Lesson Viewer Overlay ── -->
+    <div class="lesson-overlay" id="lessonOverlay">
+      <div class="lesson-panel">
+        <button class="lesson-close" onclick="closeLesson()">✕</button>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <span class="badge-inline" id="lessonBadge">Leçon 1.1</span>
+          <span style="color:var(--muted);font-size:14px;">M1 — Comprendre l'IA pour les développeurs</span>
+        </div>
+
+        <h2 id="lessonTitle" style="margin:0 0 4px;">Panorama des outils IA pour les développeurs</h2>
+        <p id="lessonSubtitle" style="color:var(--muted);margin:0 0 16px;">Découvrir les principaux outils pour les développeurs et leurs différences.</p>
+
+        <!-- Format tabs -->
+        <div class="lesson-format-bar" id="lessonFormatBar">
+          <button class="lesson-format-btn active" data-lf="video" onclick="switchLessonFormat('video')">🎬 Vidéo</button>
+          <button class="lesson-format-btn" data-lf="audio" onclick="switchLessonFormat('audio')">🎧 Audio</button>
+          <button class="lesson-format-btn" data-lf="text" onclick="switchLessonFormat('text')">📖 Texte</button>
+        </div>
+
+        <!-- Video Content -->
+        <div class="lesson-content active" id="lessonVideo">
+          <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+            <div style="text-align:center;color:var(--muted);">
+              <div style="font-size:48px;margin-bottom:12px;">🎬</div>
+              <div style="font-weight:700;">Lecteur vidéo intégré</div>
+              <div style="font-size:14px;">Hébergement Cloudflare Stream / Mux à venir</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a class="btn btn-secondary" style="font-size:13px;" id="lessonVideoLink" href="#" target="_blank">📄 Voir le script complet</a>
+            <span style="color:var(--muted);font-size:13px;align-self:center;" id="lessonDuration">⏱️ 10 min</span>
+          </div>
+        </div>
+
+        <!-- Audio Content -->
+        <div class="lesson-content" id="lessonAudio">
+          <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:32px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:48px;margin-bottom:12px;">🎧</div>
+            <div style="font-weight:700;margin-bottom:8px;">Version audio de la leçon</div>
+            <div style="color:var(--muted);font-size:14px;margin-bottom:20px;">
+              <div id="lessonAudioDuration">⏱️ 10 min · À écouter hors-ligne ou en déplacement</div>
+            </div>
+            <div style="width:100%;max-width:400px;margin:0 auto;height:6px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
+              <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn btn-primary" style="pointer-events:none;opacity:0.6;">▶️ Écouter</button>
+              <a class="btn btn-secondary" style="font-size:13px;" id="lessonAudioLink" href="#" target="_blank">📄 Transcription</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text Content -->
+        <div class="lesson-content" id="lessonText">
+          <div id="lessonTextContent" style="max-height:500px;overflow-y:auto;padding-right:8px;">
+            <!-- Populated dynamically by JavaScript -->
+          </div>
+          <a class="lesson-complete-btn" id="lessonTextLink" href="#" target="_blank">📄 Lire la version texte complète</a>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+          <button class="btn btn-secondary" onclick="closeLesson()">← Retour au programme</button>
+          <button class="btn btn-primary" onclick="closeLesson();">✅ Continuer vers le module suivant</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ───────────────────────────────────────────
+    // 1. LANGUAGE CONTENT
+    // ───────────────────────────────────────────
+    const languageContent = {
+      fr: {
+        title: "Comment l'IA peut vous aider à faire du Vibe Coding",
+        desc: "Codez plus vite, mieux et de façon plus intelligente grâce à une méthode pratique qui vous aide à générer du code, corriger des bugs, améliorer vos composants et finaliser vos projets plus proprement."
+      },
+      ar: {
+        title: "كيف يمكن للذكاء الاصطناعي أن يساعدك في Vibe Coding",
+        desc: "تعلّم كيف تكتب الكود بشكل أسرع وأفضل عبر مسار عملي يساعدك على توليد الكود، تصحيح الأخطاء، تحسين المكونات، وإنهاء المشاريع بطريقة أكثر احترافية."
+      },
+      en: {
+        title: "How AI Can Help You Do Vibe Coding",
+        desc: "Learn how to code faster and better through a practical path that helps you generate code, fix bugs, improve components, and finish projects more professionally."
+      }
+    };
+
+    // ───────────────────────────────────────────
+    // 2. SCROLL
+    // ───────────────────────────────────────────
+    function scrollToSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ───────────────────────────────────────────
+    // 3. MODULES (accordéon)
+    // ───────────────────────────────────────────
+    function toggleModule(head) {
+      const card = head.closest('.module-card');
+      const body = card.querySelector('.module-body');
+      const isOpen = card.classList.contains('open');
+
+      if (isOpen) {
+        body.style.maxHeight = '0px';
+        card.classList.remove('open');
+      } else {
+        card.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    }
+
+    function initModules() {
+      document.querySelectorAll('.module-card').forEach(card => {
+        const body = card.querySelector('.module-body');
+        if (card.classList.contains('open')) {
+          body.style.maxHeight = body.scrollHeight + 'px';
+        } else {
+          body.style.maxHeight = '0px';
+        }
+      });
+    }
+
+    // ───────────────────────────────────────────
+    // 4. FAQ
+    // ───────────────────────────────────────────
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const answer = item.querySelector('.faq-answer');
+      const isOpen = item.classList.contains('open');
+
+      if (isOpen) {
+        answer.style.maxHeight = '0px';
+        item.classList.remove('open');
+      } else {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    }
+
+    function initFaq() {
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const answer = item.querySelector('.faq-answer');
+        if (item.classList.contains('open')) {
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        } else {
+          answer.style.maxHeight = '0px';
+        }
+      });
+    }
+
+    // ───────────────────────────────────────────
+    // 5. LANGUAGE TOGGLE
+    // ───────────────────────────────────────────
+    function initLangToggle() {
+      const buttons = document.querySelectorAll('#langToggle .toggle-btn');
+      const title = document.getElementById('courseTitle');
+      const desc = document.getElementById('courseDesc');
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const lang = btn.dataset.lang;
+          title.textContent = languageContent[lang].title;
+          desc.textContent = languageContent[lang].desc;
+
+          document.documentElement.lang = lang === 'ar' ? 'ar' : lang;
+          document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        });
+      });
+    }
+
+    // ───────────────────────────────────────────
+    // 6. FORMAT TOGGLE (section formats)
+    // ───────────────────────────────────────────
+    function initFormatToggle() {
+      const buttons = document.querySelectorAll('#formatToggle .toggle-btn');
+      const cards = document.querySelectorAll('.format-card');
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const format = btn.dataset.format;
+          cards.forEach(card => {
+            card.classList.toggle('selected', card.dataset.formatCard === format);
+          });
+        });
+      });
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const format = card.dataset.formatCard;
+          buttons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.format === format);
+          });
+          cards.forEach(c => c.classList.toggle('selected', c === card));
+        });
+      });
+    }
+
+    // ───────────────────────────────────────────
+    // 7. NAV SPY
+    // ───────────────────────────────────────────
+    function initNavSpy() {
+      const links = document.querySelectorAll('.nav a');
+      const sections = [...links].map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      window.addEventListener('scroll', () => {
+        let current = sections[0];
+        sections.forEach(section => {
+          const top = section.getBoundingClientRect().top;
+          if (top <= 120) current = section;
+        });
+
+        links.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${current.id}`);
+        });
+      });
+    }
+
+    // ───────────────────────────────────────────
+    // 8. LESSON VIEWER
+    // ───────────────────────────────────────────
+    function openLesson(id) {
+      document.getElementById('lessonOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLesson() {
+      document.getElementById('lessonOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close overlay when clicking outside the panel
+    document.getElementById('lessonOverlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeLesson();
+    });
+
+    function switchLessonFormat(format) {
+      // Update tabs
+      document.querySelectorAll('#lessonFormatBar .lesson-format-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lf === format);
+      });
+      // Show content
+      document.querySelectorAll('.lesson-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('lessonVideo').classList.toggle('active', format === 'video');
+      document.getElementById('lessonAudio').classList.toggle('active', format === 'audio');
+      document.getElementById('lessonText').classList.toggle('active', format === 'text');
+    }
+
+    // Close overlay on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLesson();
+    });
+
+    // ───────────────────────────────────────────
+    // 9. INIT
+    // ───────────────────────────────────────────
+    initModules();
+    initFaq();
+    initLangToggle();
+    initFormatToggle();
+    initNavSpy();
+
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.module-card.open .module-body').forEach(body => {
+        body.style.maxHeight = body.scrollHeight + 'px';
+      });
+      document.querySelectorAll('.faq-item.open .faq-answer').forEach(answer => {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+{
+  "module": 1,
+  "titre": "Comprendre l'IA pour les développeurs",
+  "nb_questions": 4,
+  "score_minimum": 70,
+  "langue": "fr",
+  "questions": [
+    {
+      "id": "M1-Q01",
+      "question": "Quelle est la principale différence entre GitHub Copilot et Claude/ChatGPT dans un contexte de développement ?",
+      "options": [
+        {
+          "id": "A",
+          "texte": "Copilot est gratuit, Claude est payant",
+          "correct": false
+        },
+        {
+          "id": "B",
+          "texte": "Copilot s'intègre dans l'IDE et propose du code en temps réel, tandis que Claude est un chat généraliste adapté à la réflexion et à l'explication",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "texte": "Copilot ne fonctionne qu'avec TypeScript, Claude accepte plusieurs langages",
+          "correct": false
+        },
+        {
+          "id": "D",
+          "texte": "Copilot génère de la documentation, Claude génère du code",
+          "correct": false
+        }
+      ],
+      "justification": "La distinction clé n'est ni le coût (A) ni la spécialisation par langage (C). Copilot agit comme un pair programmer dans l'éditeur — il propose des complétions en temps réel dans le contexte du fichier ouvert. Claude/ChatGPT est un assistant conversationnel : on lui pose des questions, il explique, planifie, ou génère du code hors contexte IDE. Les deux sont complémentaires."
+    },
+    {
+      "id": "M1-Q02",
+      "question": "Un collègue te montre ce prompt : \"Crée un formulaire React\". Pourquoi est-ce un prompt faible ?",
+      "options": [
+        {
+          "id": "A",
+          "texte": "Il est en français, l'IA ne comprend que l'anglais",
+          "correct": false
+        },
+        {
+          "id": "B",
+          "texte": "Il manque le contexte : le type de champs, le style, le comportement attendu (validation, soumission), ce qui force l'IA à deviner et produit un résultat générique",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "texte": "React ne supporte pas les formulaires",
+          "correct": false
+        },
+        {
+          "id": "D",
+          "texte": "Le mot \"formulaire\" est trop long pour l'IA",
+          "correct": false
+        }
+      ],
+      "justification": "Un prompt faible ne donne pas assez de contraintes. Ici, l'IA ne sait pas quels champs (email, nom, mot de passe ?), quel framework UI (Tailwind, Material UI ?), ni quel comportement attendre (validation, appel API). Résultat : un code générique que tu devras retoucher. Un prompt fort décrit le quoi, le comment, et le contexte."
+    },
+    {
+      "id": "M1-Q03",
+      "question": "Quelle est la bonne attitude face à du code généré par IA ?",
+      "options": [
+        {
+          "id": "A",
+          "texte": "L'utiliser sans le lire, puisque l'IA est plus fiable qu'un humain",
+          "correct": false
+        },
+        {
+          "id": "B",
+          "texte": "Ne jamais l'utiliser car l'IA fait trop d'erreurs",
+          "correct": false
+        },
+        {
+          "id": "C",
+          "texte": "Le lire, le comprendre, le tester, et ne garder que ce qui correspond au besoin réel",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "texte": "Copier-coller et ajuster si le code plante",
+          "correct": false
+        }
+      ],
+      "justification": "L'IA est un accélérateur, pas un oracle. Elle peut générer du code qui semble correct mais contient des failles de sécurité, des incohérences, ou de la dette technique invisible. Lire et comprendre le code généré est indispensable avant de l'intégrer. Les options A et D sont risquées ; l'option B est trop restrictive et te prive d'un gain de productivité réel."
+    },
+    {
+      "id": "M1-Q04",
+      "question": "Dans quel scénario est-il plus pertinent d'utiliser un chat généraliste (Claude/ChatGPT) plutôt qu'un assistant IDE (Copilot) ?",
+      "options": [
+        {
+          "id": "A",
+          "texte": "Compléter une fonction TypeScript déjà entamée dans un fichier existant",
+          "correct": false
+        },
+        {
+          "id": "B",
+          "texte": "Renommer une variable dans tout un projet",
+          "correct": false
+        },
+        {
+          "id": "C",
+          "texte": "Concevoir l'architecture d'une API REST avant d'écrire la première ligne de code",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "texte": "Corriger une erreur de syntaxe évidente",
+          "correct": false
+        }
+      ],
+      "justification": "Copilot excelle dans la micro-productivité (compléter une fonction, renommer, corrections simples). Mais quand il s'agit de concevoir, de planifier une structure, de peser des compromis architecturaux — c'est là qu'un chat généraliste brille. Il peut te donner un plan détaillé, expliquer les alternatives, et te poser des questions de clarification que Copilot ne peut pas formuler."
+    }
+  ]
+}

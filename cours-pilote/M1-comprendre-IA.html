@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M1 — Comprendre l'IA | 212ay.com</title>
+  <style>
+    :root {
+      --bg: #081120; --bg-soft: #0d1830;
+      --card: rgba(255,255,255,0.08);
+      --card-strong: rgba(255,255,255,0.12);
+      --border: rgba(255,255,255,0.12);
+      --text: #eef4ff; --muted: #b8c4dc;
+      --primary: #6d7cff; --secondary: #00c2a8;
+      --accent: #9f7aea; --warning: #ffb454;
+      --success: #30d158; --danger: #ff6b6b;
+      --radius: 20px; --container: 1000px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: radial-gradient(circle at top left, rgba(109,124,255,0.18), transparent 25%),
+                  radial-gradient(circle at top right, rgba(0,194,168,0.14), transparent 20%),
+                  linear-gradient(180deg, #07111f 0%, #0a1326 100%);
+      color: var(--text); line-height: 1.6;
+    }
+    .container { width: min(100% - 32px, var(--container)); margin: 0 auto; }
+
+    /* ── Header ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(16px);
+      background: rgba(7,17,31,0.85);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 12px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+    .brand-badge {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-weight: 900; font-size: 14px;
+    }
+    .nav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .nav a {
+      padding: 8px 14px; border-radius: 999px;
+      color: var(--muted); transition: 0.25s;
+      font-size: 13px;
+    }
+    .nav a:hover, .nav a.active { color: white; background: rgba(255,255,255,0.08); }
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 999px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); font-size: 13px; cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* ── Hero ── */
+    .hero { padding: 40px 0 24px; }
+    .hero-card {
+      padding: 28px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    .module-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      background: rgba(109,124,255,0.15); color: #b3c4ff;
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px; font-weight: 700; margin-bottom: 12px;
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 3vw, 2.6rem); letter-spacing: -0.02em; }
+    .lead { margin: 0 0 16px; color: var(--muted); font-size: 1rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border-radius: 999px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px; color: #e8efff;
+    }
+    .progress-bar {
+      height: 6px; background: rgba(255,255,255,0.08);
+      border-radius: 999px; overflow: hidden; margin-top: 8px;
+    }
+    .progress-bar > span {
+      display: block; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      border-radius: inherit; transition: width 0.5s ease;
+    }
+
+    /* ── Lesson Tabs ── */
+    .lesson-tabs {
+      display: flex; gap: 8px; margin: 20px 0;
+      padding: 6px; border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow-x: auto;
+    }
+    .lesson-tab {
+      padding: 12px 20px; border-radius: 12px; border: none;
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-weight: 700; font-size: 14px; transition: 0.2s;
+      white-space: nowrap;
+    }
+    .lesson-tab:hover { background: rgba(255,255,255,0.06); }
+    .lesson-tab.active {
+      background: linear-gradient(135deg, rgba(109,124,255,0.2), rgba(159,122,234,0.2));
+      color: white; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .lesson-tab.locked { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Lesson Panel ── */
+    .lesson-panel { display: none; }
+    .lesson-panel.active { display: block; }
+
+    .format-bar {
+      display: flex; gap: 8px; margin-bottom: 16px;
+      padding: 6px; border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      width: fit-content;
+    }
+    .format-btn {
+      padding: 8px 16px; border-radius: 10px; border: none;
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-weight: 700; font-size: 13px; transition: 0.2s;
+    }
+    .format-btn.active {
+      background: linear-gradient(135deg, rgba(109,124,255,0.22), rgba(159,122,234,0.22));
+      color: white; border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .lesson-body { display: none; }
+    .lesson-body.active { display: block; }
+    .lesson-body h4 { margin: 20px 0 8px; color: #b3c4ff; }
+    .lesson-body pre, .code-block {
+      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 14px; overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px; line-height: 1.5; color: #c9d4ff;
+    }
+    .lesson-body code { font-family: 'JetBrains Mono', monospace; color: #b3c4ff; font-size: 13px; }
+    .tag {
+      display: inline-block; padding: 4px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; margin-right: 6px;
+    }
+    .tag-h { background: rgba(255,180,84,0.2); color: #ffb454; }
+    .tag-c { background: rgba(109,124,255,0.2); color: #6d7cff; }
+    .tag-d { background: rgba(0,194,168,0.2); color: #00c2a8; }
+    .tag-a { background: rgba(159,122,234,0.2); color: #9f7aea; }
+
+    .action-box {
+      margin: 20px 0; padding: 20px; border-radius: 16px;
+      background: rgba(159,122,234,0.08);
+      border: 1px solid rgba(159,122,234,0.15);
+    }
+
+    /* ── Quiz ── */
+    .quiz-section { padding: 32px 0 48px; }
+    .quiz-card {
+      padding: 24px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--border);
+    }
+    .quiz-question { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .quiz-question:last-child { border-bottom: none; margin-bottom: 0; }
+    .quiz-q-text { font-weight: 700; margin-bottom: 10px; font-size: 15px; }
+    .quiz-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; margin-bottom: 6px; border-radius: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer; transition: 0.2s;
+    }
+    .quiz-option:hover { background: rgba(255,255,255,0.07); }
+    .quiz-option.selected { border-color: var(--primary); background: rgba(109,124,255,0.12); }
+    .quiz-option.correct { border-color: var(--success); background: rgba(48,209,88,0.12); }
+    .quiz-option.wrong { border-color: var(--danger); background: rgba(255,107,107,0.12); }
+    .quiz-option input[type="radio"] { accent-color: var(--primary); }
+    .quiz-option label { cursor: pointer; flex: 1; }
+    .btn {
+      border: none; border-radius: 12px; padding: 12px 20px;
+      cursor: pointer; font-weight: 700; transition: 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; box-shadow: 0 8px 24px rgba(109,124,255,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08); color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), var(--secondary));
+      color: #000;
+    }
+    .quiz-result { display: none; margin-top: 16px; }
+    .quiz-result.show { display: block; }
+    .quiz-score {
+      font-size: 24px; font-weight: 800; text-align: center;
+      padding: 16px; border-radius: 14px;
+    }
+    .quiz-score.pass { background: rgba(48,209,88,0.12); color: var(--success); }
+    .quiz-score.fail { background: rgba(255,107,107,0.12); color: var(--danger); }
+    .quiz-justify {
+      margin-top: 10px; padding: 12px; border-radius: 10px;
+      background: rgba(255,255,255,0.03); border-left: 3px solid var(--primary);
+      font-size: 14px; color: var(--muted);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 999px;
+      background: rgba(48,209,88,0.1); color: #d6ffe2;
+      border: 1px solid rgba(48,209,88,0.18);
+      font-size: 13px; font-weight: 700;
+    }
+
+    .module-outro {
+      margin-top: 32px; padding: 24px; border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(109,124,255,0.12), rgba(0,194,168,0.08));
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .module-outro h3 { margin: 0; }
+
+    @media (max-width: 640px) {
+      .hero-card { padding: 20px; }
+      .lesson-tabs { flex-wrap: nowrap; }
+      .lesson-tab { padding: 10px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">
+      <div class="brand-badge">212</div>
+      <div>
+        <div style="font-size:14px;">212ay.com</div>
+        <small style="color:var(--muted);font-size:11px;">Parcours : Vibe Coding</small>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#hero" class="active">Leçons</a>
+      <a href="#quiz">Quiz</a>
+      <a href="../Structure_des_coures_212ay.html">← Retour cours</a>
+    </nav>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="hero">
+    <div class="hero-card">
+      <div class="module-badge">📦 Module 1</div>
+      <h1>Comprendre l'IA pour les développeurs</h1>
+      <p class="lead">Découvre les outils, leurs cas d'usage concrets, et les bonnes pratiques pour les utiliser sans danger.</p>
+      <div class="meta-row">
+        <span class="pill">⏱️ 35 min</span>
+        <span class="pill">📖 3 leçons</span>
+        <span class="pill">✅ Quiz final</span>
+        <span class="pill">🎬 🎧 📖 Formats disponibles</span>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);">
+          <span id="progText">0/3 leçons</span>
+          <span id="progPct">0%</span>
+        </div>
+        <div class="progress-bar"><span id="progBar"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── LESSON TABS ─── -->
+  <div class="lesson-tabs" id="lessonTabs">
+    <button class="lesson-tab active" data-lesson="1" onclick="switchLesson(1)">📖 1.1 — Panorama des outils</button>
+    <button class="lesson-tab" data-lesson="2" onclick="switchLesson(2)">📖 1.2 — Cas d'usage concrets</button>
+    <button class="lesson-tab" data-lesson="3" onclick="switchLesson(3)">📖 1.3 — Limites et bonnes pratiques</button>
+  </div>
+
+  <!-- ─── LESSON 1.1 ─── -->
+  <div class="lesson-panel active" id="lesson1">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(1,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(1,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(1,'txt')">📖 Texte</button>
+    </div>
+
+    <!-- Vidéo -->
+    <div class="lesson-body active" id="l1-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);">
+          <div style="font-size:40px;">🎬</div>
+          <div style="font-weight:700;">Lecteur vidéo — 10 min</div>
+          <div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.1/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 10 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="markComplete(1)" id="c1badge">○ Non terminée</span>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="lesson-body" id="l1-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 10 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne ou en déplacement</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;">
+          <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div>
+        </div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+
+    <!-- Texte HCDA -->
+    <div class="lesson-body" id="l1-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H — Hook</span>
+        <span class="tag tag-c">C — Concept</span>
+        <span class="tag tag-d">D — Démo</span>
+        <span class="tag tag-a">A — Action</span>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu passes des heures à écrire du boilerplate alors que ton vrai problème, c'est la logique métier ? Tu entends parler de GitHub Copilot, Cursor, Claude, mais tu ne sais pas par lequel commencer.</p>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept</span>
+        <p style="margin:8px 0 0;"><strong>3 familles d'outils IA :</strong></p>
+        <ul style="color:var(--muted);padding-left:18px;">
+          <li><strong>Assistants IDE</strong> (Copilot, Cursor) — complétion en temps réel</li>
+          <li><strong>Chats généralistes</strong> (Claude, ChatGPT) — réflexion, architecture</li>
+          <li><strong>Spécialisés</strong> (Amazon Q, Replit AI) — écosystèmes spécifiques</li>
+        </ul>
+        <p style="margin:8px 0 0;color:var(--muted);">Stratégie : maîtrise un assistant IDE + un chat généraliste.</p>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo</span>
+        <p style="margin:8px 0 8px;"><strong>Copilot :</strong> Tape une interface, Copilot propose automatiquement :</p>
+        <pre><code>interface UserProfile {
+  id: string;
+  name: string;       // ← Copilot
+  email: string;      // ← Copilot
+  avatarUrl?: string; // ← optionnel
+  createdAt: Date;    // ← typage correct
+  isActive: boolean;
+}</code></pre>
+        <p style="margin:8px 0 0;color:var(--muted);">Puis <strong>Claude</strong> pour l'architecture API + <strong>Cursor</strong> pour le debug (Cmd+K).</p>
+      </div>
+
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;"><strong>⏱️ 5 min :</strong></p>
+        <ol style="color:var(--muted);padding-left:18px;">
+          <li>Ouvre VS Code, crée <code>api.ts</code>, tape <code>fetchUserData(id)</code> → observe les suggestions</li>
+          <li>Va sur Claude.ai : <em>"Explique la différence entre Promise et async/await"</em></li>
+        </ol>
+      </div>
+
+      <div style="text-align:center;margin-top:8px;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.1/03-version-texte-hcda.md" target="_blank">📄 Version texte complète</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LESSON 1.2 ─── -->
+  <div class="lesson-panel" id="lesson2">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(2,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(2,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(2,'txt')">📖 Texte</button>
+    </div>
+
+    <div class="lesson-body active" id="l2-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);">
+          <div style="font-size:40px;">🎬</div>
+          <div style="font-weight:700;">Lecteur vidéo — 12 min</div>
+          <div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.2/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 12 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="markComplete(2)" id="c2badge">○ Non terminée</span>
+      </div>
+    </div>
+
+    <div class="lesson-body" id="l2-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 12 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne ou en déplacement</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;">
+          <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div>
+        </div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+
+    <div class="lesson-body" id="l2-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H — Hook</span>
+        <span class="tag tag-c">C — Concept</span>
+        <span class="tag tag-d">D — Démo</span>
+        <span class="tag tag-a">A — Action</span>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">Tu connais les outils, mais à quel moment précis les utiliser dans ton quotidien de dev ? Dois-tu utiliser Claude pour tout ? Copilot pour tout ? Non — chaque outil a son moment.</p>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — Les 4 moments clés</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+          <div style="padding:10px;border-radius:10px;background:rgba(109,124,255,0.1);"><strong>1. Init</strong><br><span style="color:var(--muted);font-size:13px;">Claude / ChatGPT</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(0,194,168,0.1);"><strong>2. Code</strong><br><span style="color:var(--muted);font-size:13px;">Copilot / Cursor</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(255,180,84,0.1);"><strong>3. Corriger</strong><br><span style="color:var(--muted);font-size:13px;">IDE + Chat</span></div>
+          <div style="padding:10px;border-radius:10px;background:rgba(159,122,234,0.1);"><strong>4. Finaliser</strong><br><span style="color:var(--muted);font-size:13px;">ChatGPT</span></div>
+        </div>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo — Mini-projet API Task</span>
+        <p style="margin:8px 0 8px;"><strong>Étape 1 — Init avec Claude :</strong></p>
+        <pre><code>// Claude génère la structure complète :
+// Express + TypeScript + Prisma (SQLite)
+// CRUD tasks (title, completed, createdAt)
+// Validation Zod + middleware d'erreurs</code></pre>
+        <p style="margin:8px 0 8px;"><strong>Étape 2 — Code avec Copilot :</strong> Tape <code>app.get('/tasks')</code> → Copilot propose <code>prisma.task.findMany()</code></p>
+        <p style="margin:8px 0 8px;"><strong>Étape 3 — Bug avec Cursor :</strong> Doublons de titres → Cmd+K → correction avec <code>findFirst</code> case-insensitive</p>
+        <p style="margin:8px 0 0;"><strong>Étape 4 — Doc avec ChatGPT :</strong> README complet en 10 secondes</p>
+      </div>
+
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;"><strong>⏱️ 5 min :</strong></p>
+        <ol style="color:var(--muted);padding-left:18px;">
+          <li>Fais générer une structure d'API par Claude/ChatGPT</li>
+          <li>Copie-la dans VS Code et utilise Copilot pour écrire un endpoint</li>
+          <li>Note le temps gagné</li>
+        </ol>
+      </div>
+
+      <div style="text-align:center;margin-top:8px;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.2/03-version-texte-hcda.md" target="_blank">📄 Version texte complète</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── LESSON 1.3 ─── -->
+  <div class="lesson-panel" id="lesson3">
+    <div class="format-bar">
+      <button class="format-btn active" data-lf="vid" onclick="switchFmt(3,'vid')">🎬 Vidéo</button>
+      <button class="format-btn" data-lf="aud" onclick="switchFmt(3,'aud')">🎧 Audio</button>
+      <button class="format-btn" data-lf="txt" onclick="switchFmt(3,'txt')">📖 Texte</button>
+    </div>
+
+    <div class="lesson-body active" id="l3-vid">
+      <div style="background:#000;border-radius:16px;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;color:var(--muted);">
+          <div style="font-size:40px;">🎬</div>
+          <div style="font-weight:700;">Lecteur vidéo — 10 min</div>
+          <div style="font-size:13px;">Hébergement Cloudflare Stream à venir</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.3/01-script-video.md" target="_blank">📄 Script complet</a>
+        <span style="color:var(--muted);font-size:13px;align-self:center;">⏱️ 10 min</span>
+        <span class="badge" style="margin-left:auto;" onclick="markComplete(3)" id="c3badge">○ Non terminée</span>
+      </div>
+    </div>
+
+    <div class="lesson-body" id="l3-aud">
+      <div style="background:rgba(255,255,255,0.04);border-radius:16px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+        <div style="font-weight:700;">Version audio — 10 min</div>
+        <div style="color:var(--muted);font-size:14px;margin:8px 0 16px;">À écouter hors-ligne ou en déplacement</div>
+        <div style="max-width:300px;margin:0 auto;height:5px;background:rgba(255,255,255,0.1);border-radius:999px;">
+          <div style="width:0%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;"></div>
+        </div>
+        <div style="margin-top:12px;"><button class="btn btn-primary" style="pointer-events:none;opacity:0.5;">▶️ Écouter</button></div>
+      </div>
+    </div>
+
+    <div class="lesson-body" id="l3-txt">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="tag tag-h">H — Hook</span>
+        <span class="tag tag-c">C — Concept</span>
+        <span class="tag tag-d">D — Démo</span>
+        <span class="tag tag-a">A — Action</span>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-h">Hook</span>
+        <p style="margin:8px 0 0;color:var(--muted);">L'IA peut inventer des fonctions qui n'existent pas, suggérer des failles de sécurité, et vous faire perdre des heures si vous lui faites trop confiance. Cette leçon est la plus importante du module.</p>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-c">Concept — 3 limites</span>
+        <ul style="color:var(--muted);padding-left:18px;">
+          <li><strong>Hallucinations</strong> — L'IA invente des APIs et méthodes qui n'existent pas</li>
+          <li><strong>Pas de compréhension</strong> — Elle prédit statistiquement, ne <em>comprend</em> pas le code</li>
+          <li><strong>Contexte limité</strong> — Perd le fil au-delà de ~100K tokens</li>
+        </ul>
+        <p style="margin:8px 0 0;color:var(--warning);font-weight:700;">⚠️ Piège n°1 : le code a l'air correct mais ne l'est pas.</p>
+      </div>
+
+      <div style="padding:14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:12px;">
+        <span class="tag tag-d">Démo — 3 pièges</span>
+        <p style="margin:8px 0 4px;"><strong>Piège 1 — API imaginaire :</strong></p>
+        <pre><code>await prisma.user.searchVector(query);
+// ⚠️ searchVector() n'existe PAS dans Prisma</code></pre>
+        <p style="margin:8px 0 4px;"><strong>Piège 2 — Faille sécurité :</strong> Path traversal non géré dans un endpoint de download</p>
+        <p style="margin:8px 0 4px;"><strong>Piège 3 — Edge case :</strong> Division par zéro si tableau vide</p>
+        <p style="margin:8px 0 0;color:var(--muted);"><strong>Les 5 règles d'or :</strong></p>
+        <ol style="color:var(--muted);padding-left:18px;font-size:14px;">
+          <li>Toujours lire le code généré avant de l'exécuter</li>
+          <li>Toujours tester les cas limites</li>
+          <li>Ne jamais copier du code que tu ne comprends pas</li>
+          <li>Vérifier la sécurité</li>
+          <li>L'IA est un accélérateur, pas un substitut</li>
+        </ol>
+      </div>
+
+      <div class="action-box">
+        <span class="tag tag-a">Action</span>
+        <p style="margin:8px 0 0;"><strong>⏱️ 5 min :</strong> Prends un code généré par IA, relis-le ligne par ligne, trouve au moins un problème.</p>
+      </div>
+
+      <div style="text-align:center;margin-top:8px;">
+        <a class="btn btn-secondary" style="font-size:13px;text-decoration:none;" href="M1-Lecon1.3/03-version-texte-hcda.md" target="_blank">📄 Version texte complète</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── QUIZ SECTION ─── -->
+  <section class="quiz-section" id="quiz">
+    <div class="quiz-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h2 style="margin:0;">✅ Quiz du Module 1</h2>
+          <p style="margin:4px 0 0;color:var(--muted);font-size:14px;">4 questions · Score minimum 70% · Valide tes connaissances</p>
+        </div>
+        <span id="quizProgress" style="color:var(--muted);font-size:14px;">0/4 répondues</span>
+      </div>
+
+      <div id="quizQuestions"></div>
+
+      <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitQuiz()">✅ Valider le quiz</button>
+        <button class="btn btn-secondary" onclick="resetQuiz()">↺ Rejouer</button>
+      </div>
+
+      <div id="quizResult" class="quiz-result"></div>
+    </div>
+  </section>
+
+  <!-- ─── OUTRO ─── -->
+  <div class="module-outro">
+    <div>
+      <h3>🏁 Module 1 terminé ?</h3>
+      <p style="margin:4px 0 0;color:var(--muted);">Passe au Module 2 : Prompter efficacement pour générer du code.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <span class="badge" id="completeBadge">📋 0/3 leçons</span>
+      <a class="btn btn-primary" style="text-decoration:none;" href="../Structure_des_coures_212ay.html#programme">📦 Voir Module 2</a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── Quiz Data ──
+  const quizData = [
+    { id: "M1-Q01", question: "Quelle est la principale différence entre GitHub Copilot et Claude/ChatGPT dans un contexte de développement ?",
+      options: ["Copilot est gratuit, Claude est payant", "Copilot s'intègre dans l'IDE et propose du code en temps réel, tandis que Claude est un chat généraliste adapté à la réflexion et à l'explication", "Copilot ne fonctionne qu'avec TypeScript, Claude accepte plusieurs langages", "Copilot génère de la documentation, Claude génère du code"],
+      correct: 1, justification: "Copilot propose des complétions en temps réel dans le contexte du fichier ouvert. Claude/ChatGPT est un assistant conversationnel : il explique, planifie, ou génère du code hors contexte IDE." },
+    { id: "M1-Q02", question: "Un collègue te montre ce prompt : \"Crée un formulaire React\". Pourquoi est-ce un prompt faible ?",
+      options: ["Il est en français, l'IA ne comprend que l'anglais", "Il manque le contexte : le type de champs, le style, le comportement attendu, ce qui force l'IA à deviner", "React ne supporte pas les formulaires", "Le mot \"formulaire\" est trop long pour l'IA"],
+      correct: 1, justification: "Un prompt faible ne donne pas assez de contraintes. L'IA ne sait pas quels champs, quel framework UI, ni quel comportement attendre." },
+    { id: "M1-Q03", question: "Quelle est la bonne attitude face à du code généré par IA ?",
+      options: ["L'utiliser sans le lire, l'IA est plus fiable", "Ne jamais l'utiliser car l'IA fait trop d'erreurs", "Le lire, le comprendre, le tester, ne garder que ce qui correspond au besoin", "Copier-coller et ajuster si le code plante"],
+      correct: 2, justification: "L'IA est un accélérateur, pas un oracle. Lire et comprendre le code généré est indispensable." },
+    { id: "M1-Q04", question: "Dans quel scénario est-il plus pertinent d'utiliser un chat généraliste plutôt qu'un assistant IDE ?",
+      options: ["Compléter une fonction TypeScript", "Renommer une variable", "Concevoir l'architecture d'une API REST avant d'écrire du code", "Corriger une erreur de syntaxe"],
+      correct: 2, justification: "Copilot excelle dans la micro-productivité. Mais pour concevoir, planifier, peser des compromis — un chat généraliste est bien plus adapté." }
+  ];
+
+  let quizAnswers = {};
+  let completedLessons = new Set();
+
+  // ── Lesson Switching ──
+  function switchLesson(n) {
+    document.querySelectorAll('.lesson-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('active'));
+    document.querySelector(`.lesson-tab[data-lesson="${n}"]`).classList.add('active');
+    document.getElementById(`lesson${n}`).classList.add('active');
+  }
+
+  function switchFmt(lesson, fmt) {
+    const panel = document.getElementById(`lesson${lesson}`);
+    panel.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    panel.querySelector(`.format-btn[data-lf="${fmt}"]`).classList.add('active');
+    panel.querySelectorAll('.lesson-body').forEach(b => b.classList.remove('active'));
+    panel.getElementById(`l${lesson}-${fmt}`).classList.add('active');
+  }
+
+  // ── Mark Complete ──
+  function markComplete(n) {
+    if (completedLessons.has(n)) {
+      completedLessons.delete(n);
+    } else {
+      completedLessons.add(n);
+    }
+    for (let i = 1; i <= 3; i++) {
+      const badge = document.getElementById(`c${i}badge`);
+      if (badge) {
+        badge.textContent = completedLessons.has(i) ? '✅ Terminée' : '○ Non terminée';
+        badge.style.borderColor = completedLessons.has(i) ? 'rgba(48,209,88,0.3)' : '';
+        badge.style.background = completedLessons.has(i) ? 'rgba(48,209,88,0.12)' : '';
+        badge.style.color = completedLessons.has(i) ? '#30d158' : '';
+      }
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const count = completedLessons.size;
+    const pct = Math.round((count / 3) * 100);
+    document.getElementById('progText').textContent = `${count}/3 leçons`;
+    document.getElementById('progPct').textContent = `${pct}%`;
+    document.getElementById('progBar').style.width = `${pct}%`;
+    document.getElementById('completeBadge').textContent = `📋 ${count}/3 leçons`;
+  }
+
+  // ── Quiz Engine ──
+  function renderQuiz() {
+    const container = document.getElementById('quizQuestions');
+    let html = '';
+    quizData.forEach((q, qi) => {
+      html += `<div class="quiz-question" data-qi="${qi}"><div class="quiz-q-text">${qi+1}. ${q.question}</div>`;
+      q.options.forEach((opt, oi) => {
+        const sel = quizAnswers[qi] === oi ? 'selected' : '';
+        html += `<div class="quiz-option ${sel}" onclick="selectQuizOption(${qi},${oi})">`;
+        html += `<input type="radio" name="q${qi}" value="${oi}" ${quizAnswers[qi]===oi?'checked':''}>`;
+        html += `<label>${opt}</label></div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html;
+    const answered = Object.keys(quizAnswers).length;
+    document.getElementById('quizProgress').textContent = `${answered}/${quizData.length} répondues`;
+  }
+
+  function selectQuizOption(qi, oi) { quizAnswers[qi] = oi; renderQuiz(); }
+
+  function submitQuiz() {
+    if (Object.keys(quizAnswers).length < quizData.length) {
+      alert(`Réponds à toutes les questions (${Object.keys(quizAnswers).length}/${quizData.length})`);
+      return;
+    }
+    let correct = 0;
+    quizData.forEach((q, qi) => {
+      if (quizAnswers[qi] === q.correct) correct++;
+      const opts = document.querySelectorAll(`.quiz-question[data-qi="${qi}"] .quiz-option`);
+      opts.forEach((opt, oi) => {
+        opt.classList.remove('selected');
+        if (oi === q.correct) opt.classList.add('correct');
+        if (oi === quizAnswers[qi] && oi !== q.correct) opt.classList.add('wrong');
+      });
+    });
+    const score = Math.round((correct / quizData.length) * 100);
+    const passed = score >= 70;
+    const resultDiv = document.getElementById('quizResult');
+    resultDiv.classList.add('show');
+    resultDiv.innerHTML = `
+      <div class="quiz-score ${passed?'pass':'fail'}">${passed?'✅':'❌'} Score : ${score}% ${passed?'— Réussite !':'— Minimum 70% requis'}</div>
+      <div style="text-align:center;margin:8px 0 16px;"><span style="color:var(--muted);">${correct}/${quizData.length} bonnes réponses</span></div>
+      ${quizData.map((q,qi)=>`
+        <div class="quiz-justify"><strong>${qi+1}. ${q.question}</strong><br>
+        <span style="color:${quizAnswers[qi]===q.correct?'#30d158':'#ff6b6b'};">${quizAnswers[qi]===q.correct?'✅ Bonne réponse':'❌ Mauvaise réponse'}</span><br>
+        <em>Justification :</em> ${q.justification}</div>
+      `).join('')}
+      ${passed?'<div style="text-align:center;margin-top:16px;"><span class="badge">✅ Module 1 validé — Tu peux passer au Module 2</span></div>':''}`;
+    document.querySelectorAll('.quiz-option').forEach(el => { el.style.cursor = 'default'; el.querySelector('input').disabled = true; });
+  }
+
+  function resetQuiz() { quizAnswers = {}; document.getElementById('quizResult').classList.remove('show'); document.getElementById('quizResult').innerHTML = ''; renderQuiz(); }
+
+  // ── Fix switchFmt ──
+  // (overriding the function to work with IDs correctly)
+  function switchFmt(lesson, fmt) {
+    const prefix = `l${lesson}-${fmt}`;
+    document.querySelectorAll(`#lesson${lesson} .format-btn`).forEach(b => b.classList.remove('active'));
+    document.querySelector(`#lesson${lesson} .format-btn[data-lf="${fmt}"]`).classList.add('active');
+    document.querySelectorAll(`#lesson${lesson} .lesson-body`).forEach(b => b.classList.remove('active'));
+    document.getElementById(prefix).classList.add('active');
+  }
+
+  renderQuiz();
+  updateProgress();
+
+  // Nav spy
+  document.querySelectorAll('.nav a').forEach(link => {
+    link.addEventListener('click', function() {
+      document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
